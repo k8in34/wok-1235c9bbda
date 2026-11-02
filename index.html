@@ -90,6 +90,10 @@ button{font-family:inherit;border:0;cursor:pointer;color:inherit}
 .tip svg{flex:0 0 26px;height:26px}
 .tip .pt{margin-left:auto;font-weight:700;color:#ff9a8c;white-space:nowrap}
 .tip.g .pt{color:#9be58a}
+.tip em{font-style:normal;font-weight:700;font-size:12px;padding:1px 6px;border-radius:6px;margin-right:6px;background:#e04a3a;color:#fff}
+.tip.safe{border:1px solid #e04a3a}.tip.var em{background:#3d9a4a}.tip.soft em{background:#3a7bd5}.tip.good em{background:#3d9a4a}.tip.k{background:#ffffff14}.tip.k em{background:#c98a1e}
+h3.cat{margin:14px 2px 8px;font-size:16px;color:#ffcf8a}
+.st.op{opacity:.75;border-style:dashed}
 .rbtn{display:flex;gap:10px;width:100%;margin-top:12px}
 .rbtn button{flex:1;height:48px;border-radius:14px;font-weight:800;font-size:15px;background:#ffffff18}
 .rbtn .pri{background:linear-gradient(#ffd36b,#f0a024);color:#3a2408}
@@ -104,7 +108,7 @@ button{font-family:inherit;border:0;cursor:pointer;color:inherit}
   <div class="logo"><svg width="44" height="44" viewBox="0 0 64 64"><ellipse cx="32" cy="30" rx="26" ry="9" fill="#2b2b30"/><path d="M6 30q26 34 52 0" fill="#3a3a42"/><ellipse cx="32" cy="30" rx="22" ry="6" fill="#151518"/><path d="M58 28l6-3" stroke="#8a5a2b" stroke-width="4" stroke-linecap="round"/><path d="M22 52q4-8 0-14M32 56q5-10 0-18M42 52q4-8 0-14" stroke="#ff8a3d" stroke-width="3" fill="none" stroke-linecap="round"/></svg><h1>熱炒小廚房</h1></div>
   <div class="sub">熱鍋 → 下油 → 爆香 → 下料 → 調味。順序和火候都算分。</div>
   <div class="chal" id="chal"></div>
-  <div class="cards" id="cards"></div>
+  <div id="cards"></div>
   <div class="howto">
    <div><svg width="34" height="34" viewBox="0 0 64 64"><path d="M32 6q14 18 10 30a10 10 0 0 1-20 0q-4-12 10-30z" fill="#ff8a3d"/><path d="M32 26q7 10 4 16a4 4 0 0 1-8 0q-2-6 4-16z" fill="#ffe08a"/></svg>控制火力</div>
    <div><svg width="34" height="34" viewBox="0 0 64 64"><circle cx="24" cy="36" r="12" fill="#f4eee0"/><circle cx="40" cy="30" r="10" fill="#f4eee0"/><path d="M44 10v16" stroke="#7ddc6f" stroke-width="4"/></svg>拖進鍋裡</div>
@@ -168,42 +172,150 @@ wine:'<path d="M26 4h12v10l8 10v32a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4V24l8-10z" fill
 sugar:'<path d="M8 32h48q-2 22-24 22T8 32z" fill="#4a86c8"/><ellipse cx="32" cy="32" rx="24" ry="6" fill="#6aa6e8"/><ellipse cx="32" cy="30" rx="18" ry="6" fill="#fff"/><path d="M24 28h2M34 26h2M40 30h2M30 31h2" stroke="#dde" stroke-width="2"/>',
 salt:'<path d="M20 22h24l-2 34a4 4 0 0 1-4 4H26a4 4 0 0 1-4-4z" fill="#eef2f6"/><path d="M20 22q12-16 24 0z" fill="#9aa8b8"/><circle cx="28" cy="16" r="1.5" fill="#333"/><circle cx="34" cy="14" r="1.5" fill="#333"/><rect x="22" y="34" width="20" height="8" fill="#5a9ad8"/>',
 sauce:'<path d="M8 32h48q-2 22-24 22T8 32z" fill="#f2f2ee"/><ellipse cx="32" cy="32" rx="24" ry="6" fill="#fff"/><ellipse cx="32" cy="32" rx="19" ry="4.5" fill="#6a2a14"/><ellipse cx="26" cy="31" rx="5" ry="1.5" fill="#a85a34"/><path d="M8 32q24 6 48 0" stroke="#2a6ab0" stroke-width="2" fill="none"/>',
-cucumber:'<path d="M8 46q10-30 44-36 6 4 2 10Q30 30 18 52q-8 2-10-6z" fill="#3d8a3a"/><path d="M14 44q8-20 34-30" stroke="#8ccf6a" stroke-width="3" fill="none"/>'
+cucumber:'<path d="M8 46q10-30 44-36 6 4 2 10Q30 30 18 52q-8 2-10-6z" fill="#3d8a3a"/><path d="M14 44q8-20 34-30" stroke="#8ccf6a" stroke-width="3" fill="none"/>',
+rice:'<path d="M8 32h48q-2 22-24 22T8 32z" fill="#e8e0d0"/><path d="M8 32q24 6 48 0" stroke="#c0392b" stroke-width="2" fill="none"/><path d="M12 32q4-16 20-16t20 16z" fill="#fbf8f0"/><g fill="#e8e2d2"><ellipse cx="22" cy="26" rx="2" ry="1"/><ellipse cx="30" cy="22" rx="2" ry="1"/><ellipse cx="38" cy="26" rx="2" ry="1"/><ellipse cx="44" cy="29" rx="2" ry="1"/></g>',
+pork:'<path d="M10 40q0-14 14-16 6-10 18-6 14 2 14 16 2 14-14 16-6 6-18 2-14-2-14-12z" fill="#e9a0a0"/><g fill="#c87070"><circle cx="22" cy="36" r="3"/><circle cx="34" cy="30" r="3"/><circle cx="42" cy="40" r="3"/><circle cx="30" cy="44" r="3"/></g><g fill="#fff6"><circle cx="28" cy="34" r="2"/><circle cx="38" cy="36" r="2"/></g>',
+fish:'<path d="M26 4h12v10l8 10v32a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4V24l8-10z" fill="#b8742c" opacity=".9"/><rect x="24" y="1" width="16" height="6" rx="2" fill="#e8c020"/><rect x="20" y="30" width="24" height="16" rx="2" fill="#fff"/><path d="M24 38q6-5 12 0-6 5-12 0zM36 38l4-3v6z" fill="#2a6ab0"/>',
+olive:'<path d="M27 4h10v10l7 8v34a4 4 0 0 1-4 4H24a4 4 0 0 1-4-4V22l7-8z" fill="#7a8a20"/><rect x="25" y="1" width="14" height="5" rx="2" fill="#2a2a2a"/><rect x="21" y="30" width="22" height="16" rx="2" fill="#f2ead0"/><ellipse cx="32" cy="38" rx="4" ry="5" fill="#5a7a1a"/>',
+pasta:'<ellipse cx="32" cy="36" rx="24" ry="18" fill="#f2d488"/><path d="M12 34q10-14 20 0t20 0M12 40q10-12 20 0t18 0M16 28q8-10 16 0t16 0M18 46q8-8 14 0t14 0" stroke="#d8b050" stroke-width="2.4" fill="none"/>',
+pwater:'<path d="M10 24h44v24a8 8 0 0 1-8 8H18a8 8 0 0 1-8-8z" fill="#9aa4b0"/><ellipse cx="32" cy="24" rx="22" ry="6" fill="#efe6cc"/><path d="M4 26h6M54 26h6" stroke="#555" stroke-width="4" stroke-linecap="round"/><path d="M24 14q-3-5 0-10M34 14q-3-5 0-10" stroke="#fff8" stroke-width="2.5" fill="none"/>',
+chiliflake:'<ellipse cx="32" cy="40" rx="24" ry="10" fill="#f2f2ee"/><ellipse cx="32" cy="38" rx="18" ry="6" fill="#c0391c"/><g fill="#ff7a3a"><circle cx="24" cy="36" r="2"/><circle cx="32" cy="35" r="2"/><circle cx="40" cy="38" r="2"/><circle cx="28" cy="40" r="1.6"/></g><g fill="#f6e0a0"><circle cx="36" cy="40" r="1.3"/><circle cx="22" cy="39" r="1.3"/></g>',
+parsley:'<path d="M32 58V30M32 40l-12-8M32 40l12-8" stroke="#3a7a2a" stroke-width="3"/><g fill="#4aa040"><circle cx="32" cy="22" r="9"/><circle cx="18" cy="28" r="8"/><circle cx="46" cy="28" r="8"/><circle cx="24" cy="16" r="6"/><circle cx="40" cy="16" r="6"/></g>',
+thigh:'<path d="M8 36q0-18 22-20 24-2 26 16 2 16-20 20-28 4-28-16z" fill="#f2b890"/><path d="M14 30q16-10 36-2" stroke="#fff8" stroke-width="3" fill="none"/><path d="M16 42q14 6 32-2" stroke="#d8906a" stroke-width="2" fill="none"/>',
+teri:'<path d="M8 32h48q-2 22-24 22T8 32z" fill="#2a2a2a"/><ellipse cx="32" cy="32" rx="24" ry="6" fill="#444"/><ellipse cx="32" cy="32" rx="19" ry="4.5" fill="#4a1e0c"/><ellipse cx="25" cy="31" rx="6" ry="1.5" fill="#b0603a"/>',
+sugarc:'<path d="M18 20h28l-4 36H22z" fill="#e8eef6" opacity=".9"/><path d="M20 34h24l-2 22H22z" fill="#fff"/><g fill="#d8d0c0"><rect x="26" y="40" width="3" height="3"/><rect x="34" y="44" width="3" height="3"/><rect x="30" y="48" width="3" height="3"/></g><rect x="18" y="16" width="28" height="6" rx="2" fill="#c8862a"/>',
+sweetpot:'<g fill="#f0a840" stroke="#c87818" stroke-width="2"><rect x="8" y="30" width="18" height="16" rx="4"/><rect x="28" y="20" width="18" height="16" rx="4"/><rect x="30" y="40" width="18" height="16" rx="4"/></g><path d="M12 34h8M32 24h8M34 44h8" stroke="#ffe08a" stroke-width="2"/>',
+butter:'<path d="M8 38l12-12h36l-12 12z" fill="#fff2a0"/><path d="M8 38h36v12H8z" fill="#f6dc6a"/><path d="M44 38l12-12v12l-12 12z" fill="#e8c850"/><path d="M4 50h52" stroke="#c8ccd4" stroke-width="4" stroke-linecap="round"/>',
+banana:'<path d="M10 20q4 30 34 32 10 0 12-4-26-4-34-30z" fill="#ffd84a"/><path d="M10 20l-2-6 6 2z" fill="#6a4a1a"/><path d="M16 26q8 20 30 24" stroke="#e8b820" stroke-width="2" fill="none"/>',
+batter:'<path d="M8 30h48q-2 24-24 24T8 30z" fill="#7aa8d8"/><ellipse cx="32" cy="30" rx="24" ry="6" fill="#9cc0e8"/><ellipse cx="32" cy="30" rx="19" ry="4.5" fill="#f6e2a0"/><path d="M46 28l12-20" stroke="#bbb" stroke-width="3" stroke-linecap="round"/>',
+shrimp:'<g fill="none" stroke="#f08a5a" stroke-width="7" stroke-linecap="round"><path d="M14 30a10 10 0 1 0 14-6"/><path d="M36 42a9 9 0 1 0 12-6"/></g><g fill="#c8603a"><circle cx="28" cy="24" r="2"/><circle cx="48" cy="36" r="2"/></g>',
+carrot:'<path d="M12 52L40 18q8-6 12 0t-2 12z" fill="#ff8a2a"/><path d="M44 16l4-10M48 18l10-6M46 14l-2-8" stroke="#4aa040" stroke-width="3" stroke-linecap="round"/><path d="M22 40l6 2M30 32l6 2" stroke="#d86a10" stroke-width="2"/>',
+water:'<path d="M18 12h28l-4 44H22z" fill="#cfe8f8" opacity=".85"/><path d="M20 28h24l-3 28H23z" fill="#7ab8e8"/><path d="M24 34v16" stroke="#fff8" stroke-width="3" stroke-linecap="round"/>',
+ketchup:'<path d="M24 10h16l4 10v32a6 6 0 0 1-6 6H26a6 6 0 0 1-6-6V20z" fill="#d8301e"/><rect x="27" y="2" width="10" height="9" rx="2" fill="#f2f2f2"/><rect x="22" y="30" width="20" height="14" rx="2" fill="#fff"/><circle cx="32" cy="37" r="4" fill="#d8301e"/>',
+oyster:'<path d="M26 4h12v10l8 10v32a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4V24l8-10z" fill="#3a1e10"/><rect x="24" y="1" width="16" height="6" rx="2" fill="#e8b020"/><rect x="20" y="30" width="24" height="16" rx="2" fill="#c0392b"/><ellipse cx="32" cy="38" rx="6" ry="4" fill="#f2e0c0"/>'
 };
+IC.holy=IC.basil;
 const svg=(id,extra='')=>`<svg viewBox="0 0 64 64" ${extra}>${IC[id]}</svg>`;
 
 /* ============ INGREDIENTS ============
- type: oil | aroma | main | liquid | season | finish
+ type: oil | aroma | main | veg | liquid | season | finish
  tp: seconds at medium heat to reach "perfect" (d=1)
- shape: how pieces look in wok */
+ flip: pan-fried item, only the bottom side cooks; 翻面 swaps sides
+ pool: melted sugar that sits in the pan (caramel)
+ safe: food-safety item (must be fully cooked)
+ sug: sugary liquid that scorches if reduced too long */
 const ING={
  oil:{n:'油',type:'oil'},
  sesame:{n:'麻油',type:'oil'},
+ olive:{n:'橄欖油',type:'oil'},
+ butter:{n:'奶油',type:'oil'},
  garlic:{n:'蒜頭',type:'aroma',tp:5,shape:'clove',k:10,raw:'#f6f0e0',done:'#e8b85a',sz:5},
  ginger:{n:'薑片',type:'aroma',tp:7,shape:'slice',k:8,raw:'#f0d9a0',done:'#c88a34',sz:8},
- chili:{n:'乾辣椒',type:'aroma',tp:4,shape:'chili',k:7,raw:'#c4231b',done:'#8a1610',sz:9},
+ chili:{n:'辣椒',type:'aroma',tp:4,shape:'chili',k:7,raw:'#c4231b',done:'#8a1610',sz:9},
+ shrimp:{n:'蝦米',type:'aroma',tp:5,shape:'shrimp',k:10,raw:'#f08a5a',done:'#c8603a',sz:5},
  cabbage:{n:'高麗菜',type:'main',tp:9,shape:'leaf',k:22,raw:'#b8e08a',done:'#8cc85a',sz:16},
- egg:{n:'蛋液',type:'main',tp:5,shape:'egg',k:9,raw:'#ffd84a',done:'#ffc21f',sz:16},
+ egg:{n:'蛋液',type:'main',tp:5,shape:'egg',k:9,raw:'#ffd84a',done:'#ffc21f',sz:16,safe:1,bury:.3},
  tomato:{n:'番茄',type:'main',tp:8,shape:'wedge',k:12,raw:'#ef4a34',done:'#d8331e',sz:12},
- chicken:{n:'雞肉',type:'main',tp:12,shape:'cube',k:14,raw:'#f6c6b0',done:'#e8b070',sz:11},
+ chicken:{n:'雞肉',type:'main',tp:12,shape:'cube',k:14,raw:'#f6c6b0',done:'#e8b070',sz:11,safe:1},
  beef:{n:'牛肉',type:'main',tp:6,shape:'strip',k:14,raw:'#b7303a',done:'#7a3a26',sz:13},
+ rice:{n:'白飯',type:'main',tp:7,shape:'rice',k:56,raw:'#f4f1e8',done:'#f2dfa8',sz:3.2},
+ pork:{n:'豬絞肉',type:'main',tp:8,shape:'crumble',k:20,raw:'#e9a0a0',done:'#a8704a',sz:7,safe:1},
+ pasta:{n:'義大利麵',type:'main',tp:5,shape:'noodle',k:14,raw:'#f2d488',done:'#e8c060',sz:22},
+ thigh:{n:'雞腿排',type:'main',tp:9,shape:'thigh',k:2,raw:'#f6c6b0',done:'#d89a50',sz:34,flip:1,safe:1},
+ sugarc:{n:'砂糖',type:'main',tp:9,shape:'pool',k:1,raw:'#f6f2e8',done:'#c8862a',sz:52,pool:1,bury:.15},
+ sweetpot:{n:'炸地瓜',type:'main',tp:6,shape:'cube',k:14,raw:'#f0a840',done:'#e8902a',sz:12,pre:.7},
+ banana:{n:'香蕉片',type:'main',tp:4,shape:'coin',k:9,raw:'#f8eeb8',done:'#d8a040',sz:11,flip:1},
+ batter:{n:'麵糊',type:'main',tp:7,shape:'cake',k:3,raw:'#f6e2a0',done:'#c88a3c',sz:36,flip:1},
  scallion:{n:'青蔥',type:'veg',tp:4,shape:'ring',k:14,raw:'#5cbf4a',done:'#3e9a34',sz:6},
+ carrot:{n:'紅蘿蔔',type:'veg',tp:6,shape:'strip',k:10,raw:'#ff8a2a',done:'#f07a1a',sz:9},
  peanut:{n:'花生',type:'finish',tp:6,shape:'peanut',k:10,raw:'#e0b077',done:'#c88a44',sz:6},
  basil:{n:'九層塔',type:'finish',tp:3,shape:'basil',k:10,raw:'#3f9a3a',done:'#2a7a2a',sz:9},
- soy:{n:'醬油',type:'liquid',tint:'#5a2a12'},
+ holy:{n:'打拋葉',type:'finish',tp:2.5,shape:'basil',k:10,raw:'#3a8a34',done:'#2a6a2a',sz:7},
+ parsley:{n:'巴西里',type:'finish',tp:3,shape:'basil',k:10,raw:'#4aa040',done:'#3a8a30',sz:5},
+ soy:{n:'醬油',type:'liquid',tint:'#5a2a12',sug:1},
  wine:{n:'米酒',type:'liquid',tint:'#e8d8a8'},
- sauce:{n:'宮保醬',type:'liquid',tint:'#7a2a12'},
+ sauce:{n:'宮保醬',type:'liquid',tint:'#7a2a12',sug:1},
+ fish:{n:'魚露',type:'liquid',tint:'#b06a2a'},
+ oyster:{n:'蠔油',type:'liquid',tint:'#3a1e10',sug:1},
+ teri:{n:'照燒醬',type:'liquid',tint:'#4a1e0c',sug:1},
+ ketchup:{n:'番茄醬',type:'liquid',tint:'#c8301e',sug:1},
+ water:{n:'水',type:'liquid',tint:'#cfe4f0'},
+ pwater:{n:'煮麵水',type:'liquid',tint:'#efe6cc'},
  sugar:{n:'糖',type:'season'},
  salt:{n:'鹽',type:'season'},
+ chiliflake:{n:'辣椒片',type:'season'},
  cucumber:{n:'小黃瓜',type:'main',tp:6,shape:'leaf',k:12,raw:'#5aa84a',done:'#3e8a34',sz:9}
 };
-/* ============ RECIPES (real-world order) ============ */
+/* ============ RECIPES ============
+ steps: the core path shown on cards. req: must-have. opt: accepted variations (no penalty; note shown).
+ soft: [a,b,tip] a usually before b -> tip only, 0 pts. gate: hard technique rule with real consequence.
+ any: [[ids],msg] at least one needed. fat:false = dish doesn't need added fat. hot: wok should be hot before main. */
+const CATS=[['tw','台式家常'],['intl','異國料理'],['sweet','甜點']];
 const RECIPES=[
- {id:'cab',n:'蒜炒高麗菜',lv:'入門',steps:['heat','oil','garlic','cabbage','salt'],tray:['oil','garlic','cabbage','salt','soy','sugar','ginger','scallion','egg','tomato'],plate:'#e9f3dc'},
- {id:'tom',n:'番茄炒蛋',lv:'入門',steps:['heat','oil','egg','tomato','sugar','salt'],tray:['oil','egg','tomato','sugar','salt','garlic','soy','scallion','cabbage','wine'],plate:'#fff4e0'},
- {id:'bef',n:'蔥爆牛肉',lv:'中等',steps:['heat','oil','ginger','beef','scallion','soy'],tray:['oil','ginger','beef','scallion','soy','garlic','sugar','salt','wine','chili'],plate:'#f3ece2'},
- {id:'kp',n:'宮保雞丁',lv:'中等',steps:['heat','oil','chili','chicken','garlic','sauce','peanut'],tray:['oil','chili','chicken','garlic','sauce','peanut','scallion','soy','sugar','salt'],plate:'#f6efe6'},
- {id:'san',n:'三杯雞',lv:'進階',steps:['heat','sesame','ginger','garlic','chicken','soy','wine','basil'],tray:['sesame','ginger','garlic','chicken','soy','wine','basil','oil','sugar','chili'],plate:'#2e2a28'}
+ {id:'cab',cat:'tw',n:'炒高麗菜',lv:'入門',hot:1,steps:['heat','oil','garlic','cabbage','salt'],req:['oil','garlic','cabbage','salt'],
+  opt:{sugar:'加一點糖提鮮、中和鹹味是很常見的家常做法；不加也對。',water:'加少許水蓋鍋燜一下，梗比較軟；不加水大火快炒口感較脆。兩種都有人做。',chili:'加辣椒：常見變化。',shrimp:'加蝦米一起爆香，鮮味更足：常見台式做法。',carrot:'加紅蘿蔔配色：常見。',soy:'少量醬油調味也有人做，鹽要減量。'},
+  soft:[['garlic','cabbage','蒜通常先爆香再下菜，香氣比較出得來。'],['cabbage','salt','鹽太早下，菜會先出水變軟；多數人炒軟後才加鹽。']],
+  know:'菜能「炒」熟靠的是菜葉本身的水分變成蒸氣。鍋夠熱、菜瀝乾，才不會變成水煮菜。冷鍋冷油下蒜慢慢加熱也是常見做法，只要別炒焦。',
+  tray:['oil','garlic','cabbage','salt','sugar','water','chili','shrimp','carrot','egg'],plate:'#e9f3dc'},
+ {id:'tom',cat:'tw',n:'番茄炒蛋',lv:'入門',steps:['heat','oil','egg','tomato','salt'],req:['oil','egg','tomato','salt'],
+  opt:{sugar:'加糖平衡番茄酸味：台灣很常見；不加會比較酸爽。',ketchup:'加番茄醬：顏色更紅、酸甜更濃，常見做法（番茄醬偏鹹，鹽少放）。',scallion:'撒蔥花：常見。',water:'加少許水讓湯汁多一點、好拌飯：常見。',garlic:'先爆香蒜末：有人這樣做。'},
+  soft:[],
+  know:'先炒蛋到七分熟（盛起或推到旁邊）再炒番茄，蛋比較嫩；先炒番茄再下蛋液也很常見，只是口感不同。',
+  tray:['oil','egg','tomato','salt','sugar','ketchup','scallion','water','garlic','cabbage'],plate:'#fff4e0'},
+ {id:'rice',cat:'tw',n:'蛋炒飯',lv:'入門',hot:1,steps:['heat','oil','egg','rice','salt'],req:['oil','egg','rice'],any:[['salt','soy'],'少了調味：鹽或醬油都可以，不調味會很淡。'],
+  opt:{salt:'',soy:'用醬油調味：顏色較深、帶醬香，也很常見。',scallion:'起鍋前撒蔥花：常見，最香。',garlic:'加蒜末爆香：也有人這樣做。',carrot:'加紅蘿蔔丁配色：常見。'},
+  soft:[],
+  know:'用隔夜飯或攤開放涼的飯，表面水分少，才炒得粒粒分明。蛋先炒、或飯下鍋後再打蛋都有人做；重點是鍋要熱，飯是被「炒」而不是被「蒸」。（食安：剩飯要在 1 小時內放涼冷藏、24 小時內用完，別在電鍋或室溫放一整晚。）',
+  tray:['oil','egg','rice','salt','soy','scallion','garlic','carrot','sugar','basil'],plate:'#fff8ea'},
+ {id:'bef',cat:'tw',n:'蔥爆牛肉',lv:'中等',hot:1,steps:['heat','oil','beef','scallion','soy'],req:['oil','beef','scallion','soy'],
+  opt:{ginger:'加薑：常見，去腥增香。',garlic:'加蒜：常見。',chili:'加辣椒：常見變化。',sugar:'加一點糖平衡醬油鹹味：常見。',wine:'沿鍋邊嗆米酒提香：常見。',oyster:'加蠔油：常見，味道更濃。'},
+  soft:[['beef','scallion','多數做法是牛肉先炒到變色再下蔥，蔥才不會軟爛。']],
+  know:'牛肉逆紋切薄片、大火短時間炒到七八分熟，肉才嫩；炒太久蛋白質收縮出水，就會變老。',
+  tray:['oil','beef','scallion','soy','ginger','garlic','chili','sugar','wine','tomato'],plate:'#f3ece2'},
+ {id:'kp',cat:'tw',n:'宮保雞丁',lv:'中等',steps:['heat','oil','chili','chicken','sauce','peanut'],req:['oil','chili','chicken','sauce','peanut'],
+  opt:{garlic:'加蒜：常見。',ginger:'加薑：常見。',scallion:'加蔥段：川式原版常見。'},
+  gate:[{id:'sauce',on:'chicken',min:.6,p:8,msg:'雞丁還沒炒到變色就下醬汁：醬汁含糖會先焦、雞肉也不易熟'}],
+  soft:[['chili','chicken','乾辣椒先用油煸出香氣再下雞丁，辣香才會進到油裡。'],['sauce','peanut','花生太早下會吸醬汁變軟，關火前再拌最脆。']],
+  know:'辣椒的香氣成分溶於油，所以要用油煸；煸到深紅棕最香，一旦發黑就只剩苦味。',
+  tray:['oil','chili','chicken','sauce','peanut','garlic','ginger','scallion','soy','tomato'],plate:'#f6efe6'},
+ {id:'san',cat:'tw',n:'三杯雞',lv:'進階',steps:['heat','sesame','ginger','chicken','soy','wine','basil'],req:['sesame','ginger','chicken','soy','wine','basil'],
+  opt:{garlic:'加整顆蒜頭一起煸：台式三杯很常見。',sugar:'加糖／冰糖：常見，醬汁更亮、好收汁。',chili:'加辣椒：常見。',oil:'一般油混麻油：有人這樣做，麻油比較不會高溫變苦。'},
+  soft:[['ginger','chicken','薑片先用麻油煸到邊緣捲曲再下雞肉，香氣最足。'],['chicken','soy','雞肉先煎到表面上色再下醬料，比較香。'],['wine','basil','九層塔起鍋前才下，太早會黑、香味跑掉。']],
+  know:'黑麻油不耐長時間高溫，久煎容易發苦，所以煸薑用中小火（或混一般油）；九層塔最後下保留香氣。',
+  tray:['sesame','ginger','chicken','soy','wine','basil','garlic','sugar','chili','oil'],plate:'#2e2a28'},
+ {id:'kra',cat:'intl',n:'泰式打拋豬',lv:'中等',hot:1,steps:['heat','oil','garlic','pork','fish','holy'],req:['oil','garlic','pork','fish'],any:[['holy','basil'],'少了打拋葉（或九層塔）：這道的靈魂香氣。'],
+  opt:{holy:'',chili:'加辣椒：泰國做法通常會加，辣度隨個人。',sugar:'加少許糖平衡鹹味：泰國常見。',oyster:'加蠔油：較濃郁，很常見；也有人只用魚露。',soy:'加醬油：常見變化。',basil:'用九層塔代替打拋葉：台灣很常見，香氣不同但可以。'},
+  soft:[['garlic','pork','蒜（和辣椒）先爆香 20–30 秒再下肉。'],['pork','holy','打拋葉最後下，拌幾秒就關火，香氣才在。']],
+  know:'豬絞肉要炒到完全看不到粉紅（中心 71°C）。打拋葉的香氣怕熱，煮太久會散掉。',
+  tray:['oil','garlic','pork','fish','holy','chili','sugar','oyster','basil','tomato'],plate:'#f3ece2'},
+ {id:'agl',cat:'intl',n:'蒜香義大利麵',lv:'中等',ware:'pan',steps:['olive','garlic','heat','pasta','pwater'],req:['olive','garlic','pasta','pwater'],
+  opt:{chiliflake:'加辣椒片：義式常見。',parsley:'起鍋撒巴西里：常見。',salt:'補一點鹽：常見（煮麵水本身已有鹹味）。'},
+  gate:[{id:'pasta',on:'garlic',min:.6,p:5,msg:'蒜片還沒到淡金黃就下麵，蒜香還沒進到油裡'}],
+  soft:[['pasta','pwater','煮麵水在麵下鍋後加，大火拌到油水乳化成醬。']],
+  know:'冷油下蒜、中小火慢慢加熱，蒜香溶進油裡又不容易焦。煮麵水裡的澱粉讓油和水乳化，醬汁才會掛在麵上。',
+  tray:['olive','garlic','pasta','pwater','chiliflake','parsley','salt','butter','soy','basil'],plate:'#f6f4ee',hint:'冷油下蒜也可以：先放油和蒜再開中小火'},
+ {id:'teri',cat:'intl',n:'日式照燒雞',lv:'中等',ware:'pan',fat:0,steps:['heat','thigh','teri'],req:['thigh','teri'],
+  opt:{oil:'下一點油：常見；雞皮也會自己出油，不放也行。',scallion:'撒蔥花：常見裝飾。'},
+  gate:[{id:'teri',on:'thigh',min:.8,p:8,msg:'雞肉還沒兩面煎熟就下照燒醬：醬裡的糖會先焦'}],
+  soft:[],
+  know:'雞皮朝下慢煎逼出油，皮才會脆；翻面煎熟後才下醬。照燒醬（醬油＋味醂＋糖）含糖，太早下容易焦。',
+  tray:['thigh','teri','oil','scallion','garlic','ketchup','butter','basil','salt','tomato'],plate:'#f3ece2',hint:'雞皮朝下煎，按「翻面」翻'},
+ {id:'basi',cat:'sweet',n:'拔絲地瓜',lv:'進階',fat:0,steps:['heat','sugarc','sweetpot'],req:['sugarc','sweetpot'],
+  opt:{oil:'油拔：少許油炒糖，升溫快、要盯緊。',water:'水拔：加水一起煮糖，比較好控制，很常見。'},
+  gate:[{id:'sweetpot',on:'sugarc',min:.8,p:15,msg:'糖還沒到淺琥珀色就下地瓜，拉不出絲'}],
+  soft:[],
+  know:'糖漿約 150–160°C（淺琥珀色）最適合拉絲；再往上顏色會很快變深、發苦。糖轉黃就可以轉小火或關火，餘溫還會繼續加熱。',
+  tray:['sugarc','sweetpot','oil','water','salt','soy','butter','banana','egg','sesame'],plate:'#f6f4ee',hint:'糖煮到淺琥珀色再下地瓜'},
+ {id:'ban',cat:'sweet',n:'焦糖香蕉',lv:'入門',ware:'pan',steps:['heat','butter','sugarc','banana'],req:['butter','sugarc','banana'],
+  opt:{salt:'撒一點鹽：鹹甜更有層次，常見。',oil:''},
+  soft:[['sugarc','banana','先讓奶油和糖煮到冒泡再下香蕉，焦糖比較均勻。']],
+  know:'奶油加糖加熱到冒泡就是簡易焦糖。香蕉選熟但還硬的，每面煎 1–2 分鐘到金黃；太軟的香蕉會煎爛。',
+  tray:['butter','sugarc','banana','salt','oil','water','soy','egg','batter','sweetpot'],plate:'#f6f4ee',hint:'香蕉要兩面都煎，按「翻面」翻'},
+ {id:'cake',cat:'sweet',n:'煎鬆餅',lv:'入門',ware:'pan',fat:0,steps:['heat','butter','batter'],req:['batter'],
+  opt:{butter:'抹薄薄一層奶油：比較香；不沾鍋不抹也可以。',oil:'抹一點油：常見。'},
+  soft:[],
+  know:'表面小氣泡開始破、邊緣看起來乾了就翻面；中小火最穩，火太大會外焦內生。',
+  tray:['batter','butter','oil','banana','salt','sugarc','egg','water','soy','scallion'],plate:'#f6f4ee',hint:'表面冒泡開始破就翻面'}
 ];
 const HEAT_NAME=['關火','小火','中火','大火'],HEAT_T=[0,.45,.72,1];
 const $=s=>document.querySelector(s);
@@ -230,60 +342,50 @@ setMuteIcon();
 let G=null;
 const TS={v:1}; window.__wok=TS;TS.g=()=>G; // test hook: time scale
 function newGame(r){
- G={r,t:0,heat:0,temp:0,oil:0,oilType:null,liquid:[],added:[],pieces:[],pen:[],lastStir:0,toss:0,parts:[],shake:0,firstHeatAt:null,done:false,tempAtAdd:{}};
+ G={r,t:0,heat:0,temp:0,oil:0,oilType:null,liquid:[],added:[],pieces:[],pen:[],vars:[],soft:[],lastStir:0,toss:0,parts:[],shake:0,firstHeatAt:null,done:false,order:{},sugLiq:0};
 }
-const stepAt=i=>G.r.steps[i];
-function nextExpected(){const stepsNoHeat=G.r.steps.filter(s=>s!=='heat');for(const s of stepsNoHeat){if(!G.added.includes(s))return s}return null}
-function penal(p,msg,key){if(G.pen.some(x=>x.key===key))return;G.pen.push({p,msg,key});toast(msg,p>0?'bad':'good')}
+const isReq=id=>G.r.req.includes(id)||(G.r.any&&G.r.any[0].includes(id));
+const isOpt=id=>G.r.opt&&id in G.r.opt;
+// tier: 'safe' 食安 | 'qual' 品質 ; style choices never go through penal()
+function penal(p,msg,key,ids=[],tier='qual'){if(G.pen.some(x=>x.key===key))return;G.pen.push({p,msg,key,ids,tier});toast(msg+(p?`（-${p}）`:''),'bad')}
+function softTip(msg){if(!G.soft.includes(msg)){G.soft.push(msg);toast('建議：'+msg.slice(0,18)+'…')}}
 let toastT;function toast(m,c=''){const t=$('#toast');t.textContent=m;t.className='toast on '+c;clearTimeout(toastT);toastT=setTimeout(()=>t.className='toast',2400)}
+const effLo=p=>ING[p.id].flip?Math.min(p.d,p.d2):p.d, effHi=p=>ING[p.id].flip?Math.max(p.d,p.d2):p.d;
+function meanLo(id){const ps=G.pieces.filter(p=>p.id===id);return ps.length?ps.reduce((a,p)=>a+effLo(p),0)/ps.length:-1}
 
 function addIng(id){
  if(!G||G.done)return; audio();
  if(G.added.includes(id)){toast('已經下過'+ING[id].n+'了');return}
- const I=ING[id],r=G.r,need=r.steps.includes(id);
- const exp=nextExpected();
- // ---- order / technique rules ----
- if(!need) penal(6,`這道菜不用${I.n}（-6）`,'x'+id);
- else if(exp!==id){
-  const seq=r.steps.filter(s=>s!=='heat');const ei=seq.indexOf(exp),ii=seq.indexOf(id);
-  if(ii>ei) penal(8,`順序錯：${ING[exp].n}要比${I.n}先下（-8）`,'o'+id);
- }
- if(I.type!=='oil'&&!G.oil) penal(10,`還沒下油就下${I.n}，會黏鍋燒焦（-10）`,'nooil');
- if(I.type==='oil'){
-  if(G.temp<.15) penal(4,'先開火熱鍋再下油，才不會黏鍋（-4）','coldoil');
- }
- if(I.type==='aroma'&&G.temp<.3) penal(6,`鍋還不熱就下${I.n}，香氣爆不出來（-6）`,'cold'+id);
- if(I.type==='main'&&G.temp<.35) penal(6,`鍋溫不夠就下${I.n}，會出水不香（-6）`,'coldmain'+id);
- if((I.type==='liquid'||I.type==='season')&&need){
-  const mains=r.steps.filter(s=>ING[s]&&ING[s].type==='main');
-  if(mains.some(m=>!G.added.includes(m))) penal(8,`${I.n}太早下：主料還沒炒（-8）`,'early'+id);
- }
- if(I.type==='finish'&&need){
-  const rest=r.steps.filter(s=>s!=='heat'&&s!==id&&!G.added.includes(s));
-  if(rest.length) penal(6,`${I.n}要最後才下（-6）`,'fin'+id);
- }
- G.added.push(id);G.tempAtAdd[id]=G.temp;
+ const I=ING[id],r=G.r;let praised=false;
+ // ---- STYLE: accepted variation, never penalized ----
+ if(isOpt(id)&&r.opt[id]){G.vars.push(r.opt[id]);toast('常見做法：'+I.n+' ✓','good');praised=true}
+ else if(!isReq(id)&&!isOpt(id)) penal(3,`${I.n}在這道菜比較少見`,'x'+id,[id]);
+ // ---- QUALITY: real technique rules ----
+ if(r.fat!==0&&!G.oil&&['main','aroma','veg'].includes(I.type)&&!I.pool) penal(10,`還沒下油就下${I.n}，會黏鍋、容易焦`,'nooil',[id]);
+ (r.gate||[]).forEach(g=>{if(g.id===id){const m=meanLo(g.on);if(m<g.min)penal(g.p,g.msg,'g'+id,[id])}});
+ (r.soft||[]).forEach(([a,b,msg])=>{if(b===id&&!G.added.includes(a)&&r.steps.includes(a))softTip(msg)});
+ if(r.hot&&I.type==='main'&&G.temp<.35&&G.oil)softTip('鍋還不夠熱就下料，容易出水、黏鍋；等油面出現波紋再下。');
+ G.order[id]=G.added.length;G.added.push(id);
  // ---- physical effect ----
  const hot=G.temp>.35&&(G.oil||I.type==='oil');
  if(I.type==='oil'){G.oil=1;G.oilType=id;if(G.temp>.3)burst(.25,.5)}
- else if(I.type==='liquid'){G.liquid.push(I.tint);G.temp=Math.max(0,G.temp-.12);G.liqT=G.t;burst(.9,1.4);for(let i=0;i<30;i++)spawn('steam')}
+ else if(I.type==='liquid'){G.liquid.push(I.tint);if(I.sug)G.sugLiq=1;G.temp=Math.max(0,G.temp-.12);burst(.9,1.4);for(let i=0;i<30;i++)spawn('steam')}
  else if(I.type==='season'){for(let i=0;i<20;i++)spawn('grain')}
  else{
-  for(let i=0;i<I.k;i++){const a=Math.random()*Math.PI*2,rr=Math.sqrt(Math.random());
-   G.pieces.push({id,x:Math.cos(a)*rr*.85,y:Math.sin(a)*rr*.75,vy:0,z:-(.6+Math.random()*1.4),d:0,bot:Math.random()<.45,rot:Math.random()*6.3,s:.8+Math.random()*.4,vr:0,seed:Math.random()})}
+  if(I.pool)G.pieces.push({id,x:0,y:.05,vy:0,z:0,d:0,bot:false,rot:0,s:1,vr:0,seed:.5});
+  else for(let i=0;i<I.k;i++){let x,y;if(I.flip&&I.k<=3){x=(i-(I.k-1)/2)*.62;y=(i%2?.12:-.08)}else{const a=Math.random()*Math.PI*2,rr=Math.sqrt(Math.random());x=Math.cos(a)*rr*.85;y=Math.sin(a)*rr*.75}
+   G.pieces.push({id,x,y,vy:0,z:-(.6+Math.random()*1.4),d:I.pre||0,d2:I.pre||0,bot:Math.random()<.45,rot:I.flip&&I.k<=3?0:Math.random()*6.3,s:I.flip&&I.k<=3?1:.8+Math.random()*.4,vr:0,seed:Math.random()})}
   if(I.type==='main')G.temp=Math.max(0,G.temp-.08);
   if(hot){burst(.8,1);for(let i=0;i<18;i++)spawn('splash')}else clank();
  }
  if(hot&&I.type!=='oil')for(let i=0;i<12;i++)spawn('steam');
- if(!G.pen.length||G.pen[G.pen.length-1].key==null){}
- if(need&&exp===id&&(I.type!=='aroma'||G.temp>=.3)) toast(['好！','漂亮！','順序正確','香！'][Math.random()*4|0],'good');
+ if(!praised&&isReq(id)&&!G.pen.some(p=>p.ids.includes(id))) toast(['好！','漂亮！','香！','不錯'][Math.random()*4|0],'good');
  renderSteps();renderTray();renderChips();
 }
 function stir(){if(!G||G.done)return;audio();G.lastStir=G.t;G.toss=1;
- G.pieces.forEach(p=>{p.vy=-(1.2+Math.random()*1.4);p.vr=(Math.random()-.5)*8;p.bot=Math.random()<.45});
- // even out: pull doneness slightly toward ingredient mean
- const m={};G.pieces.forEach(p=>{(m[p.id]=m[p.id]||[]).push(p.d)});
- G.pieces.forEach(p=>{const a=m[p.id],avg=a.reduce((x,y)=>x+y,0)/a.length;p.d+= (avg-p.d)*.25});
+ G.pieces.forEach(p=>{const I=ING[p.id];if(I.pool)return;if(I.flip){const t=p.d;p.d=p.d2;p.d2=t;p.vy=-1.4;p.vr=0;return}p.vy=-(1.2+Math.random()*1.4);p.vr=(Math.random()-.5)*8;p.bot=Math.random()<.45});
+ const m={};G.pieces.forEach(p=>{if(!ING[p.id].flip)(m[p.id]=m[p.id]||[]).push(p.d)});
+ G.pieces.forEach(p=>{const a=m[p.id];if(!a)return;const avg=a.reduce((x,y)=>x+y,0)/a.length;p.d+=(avg-p.d)*.25});
  if(G.pieces.length&&G.temp>.3)burst(.35,.4); else clank();
 }
 function update(dt){
@@ -292,32 +394,36 @@ function update(dt){
  const tgt=HEAT_T[G.heat];G.temp+=(tgt-G.temp)*Math.min(1,dt*(tgt>G.temp?.55:.25));
  const rate=G.temp/.72; // 1 at medium
  const since=G.t-G.lastStir;
- const unstir=Math.min(1,Math.max(0,(since-3)/6)); // 0..1 over 3-9 s without stirring
- const dry=G.oil?1:1.5;
+ const unstir=Math.min(1,Math.max(0,(since-3)/6));
+ const dry=G.oil||G.r.fat===0?1:1.5;
+ let lastMain=-1;G.added.forEach((id,i)=>{if(ING[id].type==='main')lastMain=i});
+ const water=G.added.includes('water');
  G.pieces.forEach(p=>{const I=ING[p.id];
-  let m=p.bot?1+.9*unstir:1-.5*unstir;
-  if(I.type==='aroma'&&G.pieces.some(q=>ING[q.id].type==='main'))m*=.12; // buried in main ingredient, cooled by moisture
+  let m=I.flip||I.pool?1:p.bot?1+.9*unstir:1-.5*unstir;
+  const buried=G.order[p.id]<lastMain;
+  if(buried&&I.type==='aroma')m*=.12; else if(buried&&I.bury)m*=I.bury;
+  if(I.pool&&water)m*=.6;
   p.d+=dt*rate*dry*m/I.tp*(.9+p.seed*.2);
-  // physics for toss
+  if(I.flip&&p.d2>p.d)p.d2+=0; // top side doesn't cook
   if(p.z<0||p.vy){p.vy+=dt*7;p.z+=p.vy*dt;if(p.z>0){p.z=0;p.vy=0}}
   p.rot+=p.vr*dt;p.vr*=.96;
  });
- if(G.liquid.length){G.liqDry=(G.liqDry||0)+dt*rate*.06}
+ if(G.sugLiq){G.liqDry=(G.liqDry||0)+dt*rate*.06}
  G.toss=Math.max(0,G.toss-dt*2.5);
- // particles
  const burntN=G.pieces.filter(p=>p.d>1.6).length;
  if(G.temp>.3&&(G.pieces.length||G.liquid.length)&&Math.random()<dt*20*G.temp)spawn('steam');
- if(burntN&&Math.random()<dt*(6+burntN*1.5))spawn('smoke');
+ if(burntN&&Math.random()<dt*(6+burntN*1.5*(ING[G.pieces[0].id].k<4?6:1)))spawn('smoke');
  if(G.temp>.85&&!G.pieces.length&&G.oil&&Math.random()<dt*4)spawn('smoke');
  if(G.heat&&Math.random()<dt*60*(G.heat/3))spawn('flame');
  if(G.oil&&G.temp>.4&&G.pieces.length&&Math.random()<dt*8*G.temp)spawn('pop');
  G.parts=G.parts.filter(q=>{q.l-=dt;q.x+=q.vx*dt;q.y+=q.vy*dt;q.vy+=(q.g||0)*dt;return q.l>0});
  if(G.parts.length>400)G.parts.splice(0,G.parts.length-400);
- // audio
- if(AC){const act=(G.pieces.length?1:G.oil?.35:0)*Math.max(0,G.temp-.25)*1.4;sizzleG.gain.setTargetAtTime(Math.min(.35,act*.35)+(G.toss>.5&&G.temp>.3?.08:0),AC.currentTime,.1);fireG.gain.setTargetAtTime(G.heat*.06,AC.currentTime,.2)}
- // warnings
- if(burntN>2&&!G.warnB){G.warnB=1;toast('焦了！快翻炒或轉小火','bad')}
- if(G.oil&&G.temp>.35&&!G.warnHot&&G.r.steps[2]&&!G.pieces.length&&G.t>2){G.warnHot=1;toast('油紋出現了，可以下料','good')}
+ // audio: sizzle; a sharper crackle when something is about to burn (audio cue)
+ const near=G.pieces.some(p=>p.d>1.3);
+ if(AC){const act=(G.pieces.length?1:G.oil?.35:0)*Math.max(0,G.temp-.25)*1.4;sizzleG.gain.setTargetAtTime(Math.min(.35,act*.35)+(G.toss>.5&&G.temp>.3?.08:0),AC.currentTime,.1);fireG.gain.setTargetAtTime(G.heat*.06,AC.currentTime,.2);
+  if(near&&G.temp>.4&&Math.random()<dt*5)burst(.18,.12)}
+ if(burntN>0&&!G.warnB&&(burntN>2||G.pieces.length<4)){G.warnB=1;toast(G.r.ware==='pan'?'焦了！快翻面或轉小火':'焦了！快翻炒或轉小火','bad')}
+ if(G.oil&&G.temp>.35&&!G.warnHot&&!G.pieces.length&&G.t>2){G.warnHot=1;toast('油紋出現了，可以下料','good')}
 }
 /* ============ PARTICLES ============ */
 let W=390,H=360,CX,CY,RX,RY;
@@ -334,14 +440,16 @@ function spawn(k){const p={k};
 /* ============ DRAW ============ */
 const cv=$('#wokc'),cx=cv.getContext('2d');
 function resize(){const r=cv.getBoundingClientRect(),dpr=Math.min(2.5,devicePixelRatio||1);W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);
- RX=Math.min(W*.43,H*.75);RY=RX*.38;CX=W/2-10;CY=Math.max(RY+50,H*.42)}
+ RX=Math.min(W*.43,H*.75)*(G&&G.r.ware==='pan'?.86:1);RY=RX*.38;CX=W/2-10;CY=Math.max(RY+50,H*.42)}
 addEventListener('resize',()=>{if($('#cook').classList.contains('on'))resize()});
 function hex(c){c=c.replace('#','');return[parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)]}
 function mix(a,b,t){t=Math.max(0,Math.min(1,t));const A=hex(a),B=hex(b);return`rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(',')})`}
 function pieceColor(I,d){if(d<1)return mix(I.raw,I.done,d);if(d<1.35)return mix(I.done,I.done,0);const b=I.shape==='leaf'||I.shape==='basil'?'#2a2a14':'#22140c';if(d<1.6)return mix(I.done,mix2(I.done,b,.45),(d-1.35)/.25);return mix2(mix2(I.done,b,.45),b,Math.min(1,(d-1.6)/.4))}
 function mix2(a,b,t){const s=mix(a,b,t);const m=s.match(/\d+/g).map(Number);return'#'+m.map(v=>v.toString(16).padStart(2,'0')).join('')}
-function drawPiece(c,p,x,y,sc){const I=ING[p.id];const col=pieceColor(I,p.d);const s=I.sz*p.s*sc;
- c.save();c.translate(x,y);c.rotate(p.rot);c.fillStyle=col;c.strokeStyle='rgba(0,0,0,.25)';c.lineWidth=1;
+function drawPiece(c,p,x,y,sc){const I=ING[p.id];const col=pieceColor(I,I.flip?(p.d2||0):p.d);const s=I.sz*p.s*sc;
+ c.save();c.translate(x,y);c.rotate(p.rot);
+ if(I.flip){c.fillStyle=pieceColor(I,p.d);c.beginPath();c.ellipse(0,s*.12,s*1.06,s*(I.shape==='thigh'?.72:.62),0,0,7);c.fill()}
+ c.fillStyle=col;c.strokeStyle='rgba(0,0,0,.25)';c.lineWidth=1;
  switch(I.shape){
   case'clove':c.beginPath();c.ellipse(0,0,s,s*.7,0,0,7);c.fill();c.stroke();c.fillStyle='rgba(255,255,255,.35)';c.beginPath();c.ellipse(-s*.3,-s*.2,s*.35,s*.2,0,0,7);c.fill();break;
   case'slice':c.beginPath();for(let i=0;i<8;i++){const a=i/8*6.28,r=s*(.8+.25*Math.sin(i*2.3+p.seed*9));c.lineTo(Math.cos(a)*r,Math.sin(a)*r*.75)}c.closePath();c.fill();c.stroke();c.strokeStyle='rgba(0,0,0,.15)';c.beginPath();c.ellipse(0,0,s*.45,s*.3,0,0,7);c.stroke();break;
@@ -353,9 +461,25 @@ function drawPiece(c,p,x,y,sc){const I=ING[p.id];const col=pieceColor(I,p.d);con
   case'strip':c.beginPath();c.ellipse(0,0,s,s*.32,0,0,7);c.fill();c.stroke();c.strokeStyle='rgba(255,230,230,.35)';c.beginPath();c.moveTo(-s*.6,0);c.lineTo(s*.6,-s*.05);c.stroke();break;
   case'ring':c.beginPath();c.ellipse(0,0,s,s*.55,0,0,7);c.fill();c.fillStyle=p.seed>.6?'#eef3dc':'rgba(0,0,0,.25)';c.beginPath();c.ellipse(0,0,s*.45,s*.25,0,0,7);c.fill();break;
   case'peanut':c.beginPath();c.ellipse(-s*.35,0,s*.55,s*.45,0,0,7);c.ellipse(s*.35,0,s*.55,s*.45,0,0,7);c.fill();break;
+  case'rice':for(let i=0;i<5;i++){const a=i*1.3+p.seed*6;c.beginPath();c.ellipse(Math.cos(a)*s*.6,Math.sin(a)*s*.35,s*.32,s*.15,a,0,7);c.fill()}break;
+  case'crumble':for(let i=0;i<4;i++){const a=i*1.7+p.seed*5;c.beginPath();c.arc(Math.cos(a)*s*.45,Math.sin(a)*s*.3,s*(.32+.1*Math.sin(i+p.seed*9)),0,7);c.fill()}break;
+  case'noodle':c.strokeStyle=col;c.lineWidth=Math.max(2,s*.16);c.lineCap='round';for(let k=0;k<2;k++){c.beginPath();for(let i=0;i<=12;i++){const u=i/12;c.lineTo((u-.5)*s*2.2,Math.sin(u*9+p.seed*7+k*2)*s*.25+k*s*.25)}c.stroke()}break;
+  case'thigh':c.beginPath();c.ellipse(0,0,s,s*.62,0,0,7);c.fill();c.strokeStyle='rgba(0,0,0,.18)';c.stroke();c.fillStyle='rgba(255,255,255,.18)';c.beginPath();c.ellipse(-s*.3,-s*.2,s*.4,s*.14,-.2,0,7);c.fill();break;
+  case'cake':c.beginPath();c.ellipse(0,0,s,s*.58,0,0,7);c.fill();if(p.d>.55&&(p.d2||0)<.3){c.fillStyle='rgba(120,80,30,.45)';for(let i=0;i<9;i++){const a=i*2.4+p.seed*3,r=s*.65*Math.sqrt((i+1)/9);c.beginPath();c.arc(Math.cos(a)*r,Math.sin(a)*r*.55,1.6,0,7);c.fill()}}break;
+  case'coin':c.beginPath();c.ellipse(0,0,s,s*.6,0,0,7);c.fill();c.stroke();c.fillStyle='rgba(90,60,20,.35)';for(let i=0;i<4;i++){c.beginPath();c.arc(Math.cos(i*1.6)*s*.3,Math.sin(i*1.6)*s*.18,1.4,0,7);c.fill()}break;
+  case'pool':{c.globalAlpha=.92;c.beginPath();c.ellipse(0,0,s,s*.42,0,0,7);c.fill();c.globalAlpha=1;c.fillStyle='rgba(255,255,255,.35)';c.beginPath();c.ellipse(-s*.3,-s*.12,s*.3,s*.06,0,0,7);c.fill();if(p.d>.1&&p.d<1.5){c.fillStyle='rgba(255,255,255,.5)';for(let i=0;i<6;i++){const a=i*1.1+performance.now()/400;c.beginPath();c.arc(Math.cos(a*1.3)*s*.6,Math.sin(a)*s*.25,1.6,0,7);c.fill()}}break}
+  case'shrimp':c.lineWidth=Math.max(2,s*.35);c.lineCap='round';c.strokeStyle=col;c.beginPath();c.arc(0,0,s*.55,.4,4.2);c.stroke();break;
   case'basil':c.beginPath();c.moveTo(-s,0);c.quadraticCurveTo(0,-s*.8,s,0);c.quadraticCurveTo(0,s*.8,-s,0);c.fill();c.strokeStyle='rgba(255,255,255,.3)';c.beginPath();c.moveTo(-s,0);c.lineTo(s,0);c.stroke();break;
  }
  c.restore()}
+function drawPan(c){const wh=RY*.32;
+ c.strokeStyle='#1c1c20';c.lineWidth=14;c.lineCap='round';c.beginPath();c.moveTo(CX+RX*.95,CY+wh*.4);c.lineTo(Math.min(W-8,CX+RX*1.55),CY-RY*.2);c.stroke();
+ c.strokeStyle='#3a3a40';c.lineWidth=4;c.beginPath();c.moveTo(CX+RX*1.05,CY+wh*.1);c.lineTo(Math.min(W-12,CX+RX*1.5),CY-RY*.2);c.stroke();
+ let g=c.createLinearGradient(CX-RX,0,CX+RX,0);g.addColorStop(0,'#2a2a30');g.addColorStop(.5,'#55555e');g.addColorStop(1,'#222228');
+ c.fillStyle=g;c.beginPath();c.moveTo(CX-RX,CY);c.lineTo(CX-RX*.96,CY+wh);c.ellipse(CX,CY+wh,RX*.96,RY*.96,0,Math.PI,0,true);c.lineTo(CX+RX,CY);c.closePath();c.fill();
+ c.fillStyle='#4a4a52';c.beginPath();c.ellipse(CX,CY,RX,RY,0,0,7);c.fill();
+ g=c.createRadialGradient(CX,CY+RY*.1,4,CX,CY,RX);g.addColorStop(0,'#34343b');g.addColorStop(1,'#1d1d22');
+ c.fillStyle=g;c.beginPath();c.ellipse(CX,CY+2,RX*.93,RY*.88,0,0,7);c.fill()}
 function drawWok(){const c=cx,t=performance.now()/1000;
  c.clearRect(0,0,W,H);
  const ty=-Math.sin(G.toss*Math.PI)*14;
@@ -373,6 +497,7 @@ function drawWok(){const c=cx,t=performance.now()/1000;
  // grate
  c.strokeStyle='#555';c.lineWidth=4;c.beginPath();c.moveTo(CX-RX*.6,sy-6);c.lineTo(CX+RX*.6,sy-6);c.stroke();
  c.save();c.translate(0,ty);
+ if(G.r.ware==='pan'){drawPan(c)}else{
  // handle (wood) right, helper handle left
  c.strokeStyle='#2a2a2e';c.lineWidth=9;c.lineCap='round';c.beginPath();c.moveTo(CX+RX*.95,CY+4);c.lineTo(CX+RX*1.12,CY-6);c.stroke();
  g=c.createLinearGradient(0,CY-30,0,CY);g.addColorStop(0,'#b07a44');g.addColorStop(1,'#6a4220');c.strokeStyle=g;c.lineWidth=14;c.beginPath();c.moveTo(CX+RX*1.1,CY-5);c.lineTo(Math.min(W-6,CX+RX*1.1+60),CY-24);c.stroke();
@@ -386,6 +511,7 @@ function drawWok(){const c=cx,t=performance.now()/1000;
  c.lineWidth=5;g=c.createLinearGradient(CX-RX,CY,CX+RX,CY);g.addColorStop(0,'#666');g.addColorStop(.4,'#ddd');g.addColorStop(1,'#555');c.strokeStyle=g;c.beginPath();c.ellipse(CX,CY,RX,RY,0,0,7);c.stroke();
  // inner bowl
  g=c.createRadialGradient(CX-RX*.2,CY-RY*.3,4,CX,CY,RX);g.addColorStop(0,'#3d3d44');g.addColorStop(.6,'#1e1e22');g.addColorStop(1,'#0c0c0e');c.fillStyle=g;c.beginPath();c.ellipse(CX,CY,RX-3,RY-3,0,0,7);c.fill();
+ }
  // seasoning patina rings
  c.strokeStyle='rgba(255,255,255,.04)';c.lineWidth=1;for(let i=1;i<6;i++){c.beginPath();c.ellipse(CX,CY+RY*.1,RX*i/6.5,RY*i/6.5,0,0,7);c.stroke()}
  // oil pool
@@ -421,9 +547,9 @@ function heatIcon(){return'<svg viewBox="0 0 64 64"><path d="M32 6q16 20 12 32a1
 function renderSteps(){const r=G.r;let firstPending=-1;
  $('#steps').innerHTML=r.steps.map((s,i)=>{let cls='',done=false;
   if(s==='heat'){done=G.firstHeatAt!==null}else done=G.added.includes(s);
-  const bad=G.pen.some(p=>p.key==='o'+s||p.key==='early'+s||p.key==='fin'+s||p.key==='cold'+s);
+  const bad=G.pen.some(p=>p.ids.includes(s));const op=r.opt&&s in r.opt;
   if(done)cls=bad?'bad':'ok';else if(firstPending<0){firstPending=i;cls='next'}
-  return`<div class="st ${cls} ${s==='heat'?'hs':''}"><i>${i+1}</i>${s==='heat'?heatIcon():svg(s)}<span>${s==='heat'?'熱鍋':ING[s].n}</span></div>`}).join('')}
+  return`<div class="st ${cls} ${s==='heat'?'hs':''} ${op?'op':''}"><i>${i+1}</i>${s==='heat'?heatIcon():svg(s)}<span>${s==='heat'?'熱鍋':ING[s].n}</span></div>`}).join('')}
 function renderTray(){$('#tray').innerHTML=G.r.trayShuffled.map(id=>`<div class="ing ${G.added.includes(id)?'used':''}" data-id="${id}">${svg(id)}<span>${ING[id].n}</span></div>`).join('')}
 function renderChips(){const ids=[...new Set(G.pieces.map(p=>p.id))];
  $('#chips').innerHTML=ids.map(id=>`<div class="chip" data-c="${id}">${svg(id)}<div class="bar"><b></b></div></div>`).join('')}
@@ -452,48 +578,30 @@ let last=0;function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0)*TS.v;last=
 requestAnimationFrame(loop);
 
 /* ============ SCORING ============ */
+// Tiers: 食安 (safety) / 品質 (quality, lose points) / 做法 (style, never loses points)
+const SAFE={chicken:'雞肉要全熟（中心 74°C、切開不見粉紅、汁液清澈）才安全。',thigh:'雞腿要全熟（中心 74°C、切開不見粉紅）才安全。',pork:'絞肉要炒到完全不見粉紅（約 71°C）才安全。',egg:'蛋要炒到凝固，不要留生蛋液。'};
+const RAWMSG={sugarc:'糖還沒焦糖化，沒有顏色也拉不出絲。',batter:'鬆餅中心還是生麵糊：轉中小火、等表面冒泡再翻。',thigh:'雞皮還沒煎到金黃，雞肉也還沒熟透。'};
+const BURNTIP={garlic:'蒜末小、很快焦：爆香用中小火，聞到香味、微黃就下主料。',ginger:'薑片煸到邊緣微捲就好，焦了會苦。',chili:'辣椒焦了會嗆苦，跟蒜一起爆香就好。',scallion:'蔥段後下或最後下，才會綠又香。',egg:'蛋很快熟，七八分熟就盛起，最後再回鍋。',
+ sugarc:'焦糖過了琥珀色會發苦：一轉黃就降火，餘溫還會繼續上色。',thigh:'皮面朝下用中火慢煎讓油逼出，太大火外焦內生。',batter:'鬆餅用中小火：火大外面焦、裡面還沒熟。',banana:'香蕉切面煎到金黃就翻，含糖高很快焦。',pork:'絞肉炒散、變色就好，不用一直放著大火。',rice:'飯要常翻、壓散，不然鍋底那層會焦。',pasta:'麵下鍋後要拌，水分不夠就加煮麵水。',holy:'打拋葉最後下、拌到軟就起鍋。',basil:'九層塔最後下、拌到軟就起鍋，久了會變黑。',shrimp:'蝦米小，爆香一下就好。',sweetpot:'地瓜下鍋後快速拌勻就起鍋。',cabbage:'菜量多時要一直翻，不翻鍋底那層會焦。',beef:'牛肉大火快炒，變色就起鍋，炒久了變老。',chicken:'雞丁先過油或煎到變白，再拌醬。',peanut:'花生最後下，拌一下就好。'};
 function evaluate(){const r=G.r,tips=[];let score=100;
- G.pen.forEach(p=>{score-=p.p;tips.push({p:p.p,msg:techTip(p)})});
- if(G.firstHeatAt===null){score-=10;tips.push({p:10,msg:'全程沒開火。先開中大火熱鍋 20–30 秒再下油。'})}
- const need=r.steps.filter(s=>s!=='heat');
- need.forEach(id=>{if(!G.added.includes(id)){score-=12;tips.push({p:12,msg:`漏了${ING[id].n}。`+missTip(id)})}});
+ G.pen.forEach(p=>{score-=p.p;tips.push({p:p.p,msg:p.msg,t:p.tier})});
+ if(!G.firstHeatAt){score-=10;tips.push({p:10,msg:'從頭到尾沒開火。',t:'qual'})}
+ r.req.forEach(id=>{if(!G.added.includes(id)){score-=12;tips.push({p:12,msg:(r.miss&&r.miss[id])||`少了${ING[id].n}：這是這道菜的基本材料。`,t:'qual'})}});
+ if(r.any&&!r.any[0].some(id=>G.added.includes(id))){score-=10;tips.push({p:10,msg:r.any[1],t:'qual'})}
  const ids=[...new Set(G.pieces.map(p=>p.id))];
- ids.forEach(id=>{if(!need.includes(id))return;const ps=G.pieces.filter(p=>p.id===id),I=ING[id];
-  const m=ps.reduce((a,p)=>a+p.d,0)/ps.length,burnt=ps.filter(p=>p.d>1.6).length/ps.length,raw=ps.filter(p=>p.d<.6).length/ps.length;
-  if(burnt>.5){const pp=I.type==='aroma'?14:18;score-=pp;tips.push({p:pp,msg:burnTip(id,true)})}
-  else if(burnt>.15){score-=8;tips.push({p:8,msg:`${I.n}有${Math.round(burnt*10)}成焦黑：受熱不均，大火時每 2–3 秒就要翻炒一次。`})}
-  else if(m>1.4){score-=5;tips.push({p:5,msg:`${I.n}炒過頭了，口感變乾。`+(I.type==='main'?'八分熟就調味，起鍋前餘溫會再熟一點。':'')})}
-  if(raw>.5){const sec=Math.max(1,Math.round((1-m)*I.tp));score-=14;tips.push({p:14,msg:`${I.n}還沒熟（約${Math.max(0,Math.round(m*10))}成），中火再炒約 ${sec} 秒。`+(id==='chicken'?'雞肉沒熟有食安風險。':'')})}
-  else if(raw>.15){score-=5;tips.push({p:5,msg:`部分${I.n}還生的，多翻炒讓每塊都受熱。`})}
+ ids.forEach(id=>{const ps=G.pieces.filter(p=>p.id===id),I=ING[id],n=ps.length;
+  const burnt=ps.filter(p=>effHi(p)>1.6).length/n,raw=ps.filter(p=>effLo(p)<.6).length/n;
+  if(burnt>.3){const p=Math.round(6+burnt*12);score-=p;tips.push({p,msg:`${I.n}燒焦了（${Math.round(burnt*100)}%）。${BURNTIP[id]||'火太大或太久沒翻。'}`,t:'qual'})}
+  if(raw>.3){if(I.safe){score-=15;tips.push({p:15,msg:`${I.n}沒熟（${Math.round(raw*100)}%）。${SAFE[id]}`,t:'safe'})}
+   else{const p=Math.round(4+raw*8);score-=p;tips.push({p,msg:RAWMSG[id]||`${I.n}還不夠熟（${Math.round(raw*100)}%），多炒一下。`,t:'qual'})}}
  });
- if(G.liquid.length&&(G.liqDry||0)>.55){score-=6;tips.push({p:6,msg:'醬汁收太乾、鍋底焦糖化變苦。醬料下鍋後 30–60 秒內就起鍋。'})}
+ if(G.sugLiq&&(G.liqDry||0)>.55){score-=6;tips.push({p:6,msg:'醬汁含糖，收太乾會焦苦：收到微稠、能裹住食材就關火。',t:'qual'})}
  score=Math.max(0,Math.min(100,Math.round(score)));
- if(!tips.length)tips.push({p:0,g:1,msg:'順序、火候都對。可以試試更快完成，或挑戰下一道。'});
- tips.sort((a,b)=>b.p-a.p);
- return{score,tips:tips.slice(0,4),stars:score>=90?3:score>=70?2:score>=45?1:0}}
-function burnTip(id){return{
- garlic:'蒜頭焦了會苦。下次中火爆香 20–30 秒、轉淡金黃就下主料。',
- ginger:'薑片焦了。麻油/油溫別太高，薑煸到邊緣捲曲微乾就好。',
- chili:'乾辣椒炒黑會嗆苦。小火慢慢煸到深紅、聞到香味就下雞肉。',
- cabbage:'高麗菜焦了。大火快炒要一直翻，菜葉一軟就加鹽起鍋。',
- egg:'蛋炒焦了。蛋液下鍋後等邊緣凝固就翻，七分熟先盛起。',
- tomato:'番茄焦底了。番茄出汁後轉中火，記得翻炒。',
- chicken:'雞肉焦了外面苦、裡面柴。表面變白後轉中火，持續翻炒。',
- beef:'牛肉炒太久變老又焦。大火快炒 20–30 秒、變色八分熟就下蔥。',
- scallion:'蔥炒黑了。蔥下鍋後翻幾下就起鍋。',
- peanut:'花生焦了會苦。最後關火前下，拌勻即可。',
- basil:'九層塔焦黑了。關火前才下，拌 3–5 秒就好。'}[id]||`${ING[id].n}焦了，轉小火並多翻炒。`}
-function missTip(id){const I=ING[id];return I.type==='oil'?'沒油會黏鍋、容易焦。':I.type==='aroma'?'少了爆香，味道會很平。':I.type==='season'||I.type==='liquid'?'少了調味會淡。':''}
-function techTip(p){const k=p.key;
- if(k==='nooil')return'還沒下油就下料，容易黏鍋燒焦。順序：熱鍋 → 下油 → 爆香。';
- if(k==='coldoil')return'冷鍋下油容易黏鍋。先開火把鍋燒熱（溫度計過白線）再下油。';
- if(k.startsWith('cold')&&!k.startsWith('coldmain'))return`鍋不夠熱就下${ING[k.slice(4)].n}，香氣出不來。油面出現波紋再下。`;
- if(k.startsWith('coldmain'))return`鍋溫太低就下${ING[k.slice(8)].n}，容易出水、黏鍋。等溫度回升再下。`;
- if(k.startsWith('early'))return`${ING[k.slice(5)].n}太早下：主料還沒炒就調味會變煮的、醬油易焦。主料八分熟再下。`;
- if(k.startsWith('fin'))return`${ING[k.slice(3)].n}要最後下，太早會變黑、變軟。`;
- if(k.startsWith('o'))return p.msg.replace(/（-\d+）/,'')+'。照卡片上的順序來。';
- if(k.startsWith('x'))return`這道菜不用${ING[k.slice(1)].n}，多加會搶味。`;
- return p.msg}
+ const hard=tips.sort((a,b)=>(b.t==='safe')-(a.t==='safe')||b.p-a.p).slice(0,4);
+ const out=hard.concat(G.vars.slice(0,3).map(m=>({msg:m,t:'var'})),G.soft.slice(0,2).map(m=>({msg:m,t:'soft'})));
+ if(!hard.length)out.unshift({msg:'火候和順序都到位。',t:'good'});
+ return{score,tips:out,stars:score>=90?3:score>=70?2:score>=45?1:0,know:r.know};
+}
 /* ============ PLATE DRAW ============ */
 function drawPlate(c,w,h,pieces,r,anim){c.clearRect(0,0,w,h);const px=w/2,py=h*.56,pr=Math.min(w*.46,h*.7);
  let g=c.createRadialGradient(px,py+10,pr*.5,px,py+14,pr*1.15);g.addColorStop(0,'rgba(0,0,0,.45)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.beginPath();c.ellipse(px,py+14,pr*1.1,pr*.55,0,0,7);c.fill();
@@ -522,7 +630,8 @@ function serve(){if(!G||G.done)return;G.done=true;if(AC){sizzleG.gain.setTargetA
  if(!best[r.id]||res.score>best[r.id]){best[r.id]=res.score;localStorage.setItem('wokBest',JSON.stringify(best))}
  show('result');$('#rname').textContent=r.n;
  $('#stars').innerHTML=[0,1,2].map(i=>STAR(i<res.stars)).join('');
- $('#tips').innerHTML=res.tips.map(t=>`<div class="tip ${t.g?'g':''}">${t.g?TIPI.good:TIPI.bad}<div>${t.msg}</div>${t.p?`<span class="pt">-${t.p}</span>`:''}</div>`).join('');
+ const TAG={safe:'食安',qual:'扣分',var:'也可以',soft:'建議',good:'很好'};
+ $('#tips').innerHTML=res.tips.map(t=>`<div class="tip ${t.t}">${t.t==='safe'||t.t==='qual'?TIPI.bad:TIPI.good}<div><em>${TAG[t.t]}</em>${t.msg}</div>${t.p?`<span class="pt">-${t.p}</span>`:''}</div>`).join('')+(res.know?`<div class="tip k"><div><em>小知識</em>${res.know}</div></div>`:'');
  const ch=challenge&&challenge.r===r.id?challenge:null;
  $('#vs').textContent=ch?(res.score>ch.s?`贏過朋友的 ${ch.s} 分！`:res.score===ch.s?`和朋友同分（${ch.s}）`:`朋友 ${ch.s} 分，還差 ${ch.s-res.score} 分`):`這道最佳：${best[r.id]} 分`;
  // count up
@@ -544,14 +653,14 @@ $('#share').onclick=async()=>{const r=G.r,s=lastRes.score;const url=location.hre
 function toastR(m){const v=$('#vs');const o=v.textContent;v.textContent=m;setTimeout(()=>v.textContent=o,1800)}
 /* ============ HOME ============ */
 function thumb(c,r){const w=c.width=300,h=c.height=222;const fakeG=G;G={liquid:r.steps.filter(s=>ING[s]&&ING[s].type==='liquid').map(s=>ING[s].tint),oil:1};
- const ps=[];r.steps.forEach(s=>{const I=ING[s];if(I&&I.shape)for(let i=0;i<Math.ceil(I.k*.9);i++)ps.push({id:s,d:1.05,rot:Math.random()*6,s:.85+Math.random()*.3,seed:Math.random()})});
+ const ps=[];r.steps.forEach(s=>{const I=ING[s];if(I&&I.shape)for(let i=0;i<Math.ceil(I.k*.9);i++)ps.push({id:s,d:1.05,d2:1.05,rot:I.flip?0:Math.random()*6,s:.85+Math.random()*.3,seed:Math.random()})});
  ps.sort(()=>Math.random()-.5);drawPlate(c.getContext('2d'),w,h,ps,r);G=fakeG}
 function home(){show('home');G=null;
  const ch=$('#chal');if(challenge){const r=RECIPES.find(x=>x.id===challenge.r);ch.style.display='block';ch.innerHTML=`朋友挑戰你：<b>${r.n}</b> 拿了 <b>${challenge.s}</b> 分，點下面的${r.n}來比！`}
- $('#cards').innerHTML=RECIPES.map(r=>`<button class="rc" data-r="${r.id}"><canvas></canvas><b>${r.n}</b><span class="lv">${r.lv}・${r.steps.length} 步</span>${best[r.id]!=null?`<span class="best">★ ${best[r.id]}</span>`:''}</button>`).join('');
+ $('#cards').innerHTML=CATS.map(([k,nm])=>`<h3 class="cat">${nm}</h3><div class="cards">`+RECIPES.filter(r=>r.cat===k).map(r=>`<button class="rc" data-r="${r.id}"><canvas></canvas><b>${r.n}</b><span class="lv">${r.lv}・${r.steps.length} 步</span>${best[r.id]!=null?`<span class="best">★ ${best[r.id]}</span>`:''}</button>`).join('')+'</div>').join('');
  document.querySelectorAll('.rc').forEach(b=>{thumb(b.querySelector('canvas'),RECIPES.find(r=>r.id===b.dataset.r));b.onclick=()=>start(b.dataset.r)})}
 function start(id){audio();const r=RECIPES.find(x=>x.id===id);r.trayShuffled=[...r.tray].sort(()=>Math.random()-.5);
- newGame(r);show('cook');$('#ttl').textContent=r.n;resize();setHeatUI();renderSteps();renderTray();renderChips();$('#clock').textContent='0:00';toast('先開火熱鍋 → 溫度過白線再下油')}
+ newGame(r);show('cook');$('#ttl').textContent=r.n;resize();setHeatUI();renderSteps();renderTray();renderChips();$('#clock').textContent='0:00';const sb=$('#stir');[...sb.childNodes].filter(n=>n.nodeType===3&&n.textContent.trim()).forEach(n=>n.textContent=r.req.some(i=>ING[i].flip)?'翻面':'翻炒');toast(r.hint||'先開火熱鍋 → 溫度過白線再下油')}
 $('#back').onclick=()=>{if(AC){sizzleG.gain.value=0;fireG.gain.value=0}home()};
 $('#again').onclick=()=>start(G.r.id);
 $('#menu').onclick=home;
