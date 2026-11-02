@@ -46,8 +46,8 @@ function icon(id){const it=I5[id];if(it.svg){try{return svg(it.ic)}catch(e){}}re
 const D5={
  ricedg:{n:'電鍋白飯',cat:'rice',lv:'簡單',img:'v5d_rice_bowl',st:[['dg','電鍋']]},
  riceec:{n:'電子鍋白飯',cat:'rice',lv:'簡單',img:'v5d_rice_bowl',st:[['ec','電子鍋']]},
- cgw:{n:'白粥',cat:'rice',lv:'中等',img:'v5d_rice_bowl',st:[['potrice','湯鍋',['salt']]]},
- cgsp:{n:'地瓜粥',cat:'rice',lv:'中等',img:'v5d_rice_bowl',st:[['potrice','湯鍋',['spot','salt']]]},
+ cgw:{n:'白粥',cat:'rice',lv:'中等',img:'v53_cgw_menu',st:[['potrice','湯鍋',['salt']]]},
+ cgsp:{n:'地瓜粥',cat:'rice',lv:'中等',img:'v53_cgsp_bowl',st:[['potrice','湯鍋',['spot','salt']]]},
  ricepot:{n:'鍋煮白飯',cat:'rice',lv:'中等',img:'v5d_rice_bowl',st:[['potrice','湯鍋']]},
  souptom:{n:'番茄蛋花湯',cat:'soup',lv:'簡單',img:'v5d_soup_tomato_egg',st:[['soup','湯鍋',['oil','tomato','water','salt','egg','scallion','sesoil']]]},
  souplav:{n:'紫菜蛋花湯',cat:'soup',lv:'簡單',img:'v5d_soup_laver_egg',st:[['soup','湯鍋',['water','laver','salt','pepper','egg','scallion','sesoil']]]},
@@ -88,7 +88,7 @@ const rateBoil=T=>T>=97?1:T>=85?(T-80)/17:T>=70?.12:0;
 const rateFry=T=>Math.max(0,(T-105)/65);
 function potUpd(s,dt){const P=s.out?0:PW[s.heat],C=C0(s),wet=s.W>8,h=wet?(s.lid?3.2:5.5):(s.O>200?6.5:5);
  let q=P-h*(s.T-22);s.bi=0;
- if(wet){s.W=Math.max(0,s.W-.000025*Math.max(0,s.T-30)**2*(s.lid?.15:1)*dt);
+ if(wet){s.W=Math.max(0,s.W-.000025*Math.max(0,s.T-30)**2*(s.lid?.15:1)*(s.cg?.45:1)*dt);
   if(s.T>=99.5&&q>0){s.T=100;s.bi=q/(300+s.W*.45)*(1+s.visc*1.5);s.W=Math.max(0,s.W-q/2260*dt*(s.lid?.25:1))}else s.T=Math.min(100,s.T+q*dt/C)}
  else s.T+=q*dt/C;
  s.T=Math.max(18,s.T);if(s.bi>.7)s.bigBoil+=dt;
@@ -140,12 +140,12 @@ function ckUpd(s,dt){
 function cgUpd(s,dt){potUpd(s,dt);if(!s.riceIn){s.sfoam=0;return}const r=s.rice*180;
  if(s.T>85&&s.W>8){const tgt=r*4,ab=Math.min(s.W,dt*.0012*(tgt-s.abs)*(s.T-80)/20);s.abs+=Math.max(0,ab);s.W-=Math.max(0,ab)}
  if(s.T>=95)s.p+=dt/2100*(.75+.35*Math.min(1,s.bi*2));
- s.thick=cl(Math.min(1.2,s.p)*(r*6.3)/(s.W+s.abs+1),0,1.6);s.visc=Math.min(1,s.thick*.8);
+ s.thick=cl(Math.min(1.15,s.p)*(r*9*.72)/(s.W+s.abs+1),0,1.8);s.visc=Math.min(1,s.thick*.8);
  s.sfoam=s.W>8?cl((.25+.5*s.thick)*s.bi*(s.lid?2.4:1),0,.8):0;
  const since=K.t-s.stirT;if(s.p>.03&&s.heat&&s.T>=95){if(since>45)s.stick+=dt*Math.pow(s.heat,1.6)*(.25+s.thick)/700;if(s.stick>1)s.crust+=dt*(s.stick-1)*s.heat/260}
  if(s.W<=8&&s.heat){s.crust+=dt/120}s.scorch=Math.max(0,s.crust-1)*.8;
  if(s.bi>.7)s.cgBig=(s.cgBig||0)+dt;
- if(s.lid&&s.bi>.6&&s.W>8){s.bo=(s.bo||0)+dt*(s.bi-.6)*s.heat/1.5}else s.bo=Math.max(0,(s.bo||0)-dt*3);s.sfoam=Math.max(s.sfoam,cl((s.bo||0)/25,0,1));
+ if(s.lid&&s.heat>=2&&s.bi>.6&&s.W>8){s.bo=(s.bo||0)+dt*(s.bi-.6)*s.heat/1.5}else s.bo=Math.max(0,(s.bo||0)-dt*3);s.sfoam=Math.max(s.sfoam,cl((s.bo||0)/25,0,1));
  if(s.bo>25){s.spill=1;s.ev.spill=1;s.spillT+=dt;s.W=Math.max(0,s.W-dt*2.5);s.puddle=cl(s.puddle+dt*.01);if(s.spillT>25&&!s.out&&s.heat){s.out=1;s.ev.out=(s.ev.out||0)+1;sfx('fry',.6,.7);K&&K.douse(s)}}else{s.spill=0;s.spillT=Math.max(0,s.spillT-dt*.5)}
  s.warn=s.stick>.8||s.bo>15?1:0;s.alarm=s.alarm||s.crust>1?1:0}
 function potRiceUpd(s,dt){if(s.cg)return cgUpd(s,dt);potUpd(s,dt);
@@ -231,9 +231,9 @@ function shape(c,it,i,x,y,sz,t){const d=cl(i.c,0,2.2),col=mix(it.col0||'#ccc',it
  c.restore()}
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 function cgBed(c,s,x,y,R,RY,t,mini){const th=cl(s.thick||0,0,1.3),b=cl(s.p,0,1.2),sc=cl(s.crust/2);
- const g=c.createRadialGradient(x-R*.2,y-RY*.2,R*.05,x,y,R*.95);g.addColorStop(0,mix('#e8eef0','#fbf8ef',cl(th)));g.addColorStop(1,mix('#c9d3d6','#ece4d0',cl(th)));c.globalAlpha=.35+.6*cl(th*1.2);c.fillStyle=g;c.beginPath();c.ellipse(x,y,R*.95,RY*.9,0,0,7);c.fill();c.globalAlpha=1;
+ const g=c.createRadialGradient(x-R*.2,y-RY*.2,R*.05,x,y,R*.95);g.addColorStop(0,mix('#e8eef0','#fbf8ef',cl(th)));g.addColorStop(1,mix('#c9d3d6','#ece4d0',cl(th)));c.globalAlpha=.35+.6*cl(th*1.2);c.fillStyle=g;c.beginPath();c.ellipse(x,y,R*.95,RY*.9,0,0,7);c.fill();c.globalAlpha=1;{const tx=L('v53_congee_tex');if(tx.ok){c.save();c.beginPath();c.ellipse(x,y,R*.95,RY*.9,0,0,7);c.clip();c.globalAlpha=cl(th*b*.95);c.drawImage(tx,x-R*.95,y-RY*.9,R*1.9,RY*1.8);c.restore();c.globalAlpha=1}}
  const n=mini?60:260;for(let k=0;k<n;k++){const a=rnd(k*1.7)*6.28+(s.bi>.05?Math.sin(t*1.5+k)*.03*s.bi:0),r2=Math.sqrt(rnd(k*2.9))*.9,gx=x+Math.cos(a)*R*r2,gy=y+Math.sin(a)*RY*r2,sz=R*.032*(1+b*.9);
-  c.globalAlpha=(.45+.4*b)*(1-cl(th-.6)*.5);c.fillStyle=mix('#eae4d2','#fffdf6',cl(b));c.beginPath();c.ellipse(gx,gy,sz,sz*(.42+.2*b),a*2,0,7);c.fill();
+  c.globalAlpha=(.45+.4*b)*(1-cl(th-.6)*.5)*(L('v53_congee_tex').ok?1-.85*cl(th*b):1);c.fillStyle=mix('#eae4d2','#fffdf6',cl(b));c.beginPath();c.ellipse(gx,gy,sz,sz*(.42+.2*b),a*2,0,7);c.fill();
   if(b>.6&&k%3===0){c.fillStyle='rgba(255,255,255,.8)';c.beginPath();c.ellipse(gx+sz*.6,gy,sz*.5*(b-.5),sz*.35,a*2+1,0,7);c.fill()}}c.globalAlpha=1;
  const items=s.items.filter(i=>i.id==='spot');items.forEach(i=>{for(let n=0;n<10;n++){const sd=i.seed+n*1.3,a=rnd(sd)*6.28,r2=Math.sqrt(rnd(sd+2))*.7,px=x+Math.cos(a)*R*.9*r2,py=y+Math.sin(a)*RY*.8*r2,z=R*.075,cc=cl(i.c);c.save();c.translate(px,py+Math.sin(t*1.2+n)*s.bi*2);c.rotate(rnd(sd+5)*3);
   c.fillStyle=mix('#f2b45a','#f39a2c',cc);rr(c,-z,-z*.7,z*2,z*1.4,z*.35);c.fill();c.fillStyle=mix('#ffd58a','#ffbc58',cc);rr(c,-z*.8,-z*.65,z*1.6,z*.5,z*.25);c.fill();c.fillStyle='#8a3b2a';c.fillRect(-z,z*.55,z*2,z*.15);c.restore()}});
@@ -333,23 +333,16 @@ function pan(c,s,x,y,R,t,mini){const RY=R*.45,PY=R*.58,heat=s.out?0:s.heat;stove
  if(s.pieces.length)tofuDraw(c,s,x,y,R,RY,t,mini);
  c.restore();if((ck||s.pieces.length)&&s.T>120&&!mini)steam(c,x,y,R,cl((s.T-120)/80)*.6,t);if(s.smoke>0)smoke(c,x,y,R,s.smoke,t);
  if(s.lid){c.fillStyle='rgba(220,230,240,.35)';c.beginPath();c.ellipse(x,y-R*.02,R*.95,PY*.92,0,0,7);c.fill();c.strokeStyle='#c8ccd2';c.lineWidth=R*.03;c.stroke();c.fillStyle='#333';c.beginPath();c.ellipse(x,y-R*.06,R*.1,R*.05,0,0,7);c.fill()}}
-function dgOpen(c,s,x,y,R,t,mini){const RY=R*.42,ty=y-R*.18,by=y+R*.62;
- /* outer red body, 3/4 view */let g=c.createLinearGradient(x-R*1.1,0,x+R*1.1,0);g.addColorStop(0,'#7a1410');g.addColorStop(.3,'#d8402f');g.addColorStop(.45,'#f0705a');g.addColorStop(.7,'#c02a20');g.addColorStop(1,'#5a0e0a');c.fillStyle=g;c.beginPath();c.moveTo(x-R*1.08,ty);c.lineTo(x-R*1.0,by);c.ellipse(x,by,R*1.0,RY*.95,0,Math.PI,0,true);c.lineTo(x+R*1.08,ty);c.closePath();c.fill();
- c.fillStyle='rgba(0,0,0,.18)';c.beginPath();c.ellipse(x,by,R*1.0,RY*.95,0,0,Math.PI);c.fill();
- c.strokeStyle='rgba(255,255,255,.22)';c.lineWidth=R*.03;c.beginPath();c.ellipse(x,ty+R*.16,R*1.07,RY*1.02,0,Math.PI*.15,Math.PI*.85);c.stroke();
- /* steel rim + outer cavity */c.fillStyle='#c9ccd2';c.beginPath();c.ellipse(x,ty,R*1.08,RY*1.03,0,0,7);c.fill();g=c.createLinearGradient(0,ty-RY,0,ty+RY);g.addColorStop(0,'#5d6168');g.addColorStop(1,'#a9adb4');c.fillStyle=g;c.beginPath();c.ellipse(x,ty,R*.97,RY*.92,0,0,7);c.fill();
- if(s.ow>0){c.fillStyle='rgba(205,228,240,.55)';c.beginPath();c.ellipse(x,ty+RY*.25,R*.9,RY*.7,0,0,7);c.fill()}
- /* inner pot: steel cylinder sitting in the cavity, rim slightly proud */const ir=R*.78,iRY=RY*.78,iy=ty-R*.06,dep=R*.3;c.save();c.beginPath();c.ellipse(x,ty,R*.97,RY*.92,0,0,7);c.rect(x-R*2,ty-R*2,R*4,R*2);c.clip();
- g=c.createLinearGradient(x-ir,0,x+ir,0);g.addColorStop(0,'#7c8088');g.addColorStop(.35,'#eef0f3');g.addColorStop(.6,'#b8bcc3');g.addColorStop(1,'#6a6e76');c.fillStyle=g;c.beginPath();c.moveTo(x-ir,iy);c.lineTo(x-ir,iy+dep*1.6);c.ellipse(x,iy+dep*1.6,ir,iRY,0,Math.PI,0,true);c.lineTo(x+ir,iy);c.closePath();c.fill();c.restore();
- c.fillStyle='#e4e6ea';c.beginPath();c.ellipse(x,iy,ir,iRY,0,0,7);c.fill();
- /* inside: back wall then lower surface */c.save();c.beginPath();c.ellipse(x,iy,ir*.95,iRY*.93,0,0,7);c.clip();g=c.createLinearGradient(0,iy-iRY,0,iy+iRY);g.addColorStop(0,'#70747c');g.addColorStop(.6,'#c4c8ce');g.addColorStop(1,'#9a9ea6');c.fillStyle=g;c.fillRect(x-R,iy-R,R*2,R*2);
- c.strokeStyle='rgba(40,44,52,.6)';c.lineWidth=1.2;for(let k=1;k<=5;k++){const ly=iy-iRY*.93+k*dep*.13;c.beginPath();c.moveTo(x+ir*.12,ly);c.lineTo(x+ir*.26,ly);c.stroke()}
- const fill=cl(.35+(s.phase==='prep'?(s.iw||0)*.08:.25),0,.85),sy=iy+dep*(1-fill),sr=ir*.94,srY=iRY*.9;c.beginPath();c.ellipse(x,sy,sr,srY,0,0,7);c.clip();c.fillStyle='#8a8e96';c.fillRect(x-R,sy-R,R*2,R*2);riceBed(c,s,x,sy,sr*.98,srY*.96,mini);
- const wl=s.phase==='prep'?s.iw/s.rice:0;if(wl>0){const cloud=s.washes<3?.5-.15*s.washes:0;c.fillStyle=`rgba(${232-cloud*20|0},${238-cloud*25|0},${242-cloud*40|0},${Math.min(.8,.28+wl*.22+cloud)})`;c.fillRect(x-R,sy-R,R*2,R*2);c.strokeStyle='rgba(255,255,255,.45)';c.lineWidth=1.5;c.beginPath();c.ellipse(x-R*.12,sy-srY*.25,R*.28,srY*.08,0,0,7);c.stroke()}
- if(s.p>.6&&s.phase!=='prep'){c.fillStyle='rgba(110,100,80,.35)';for(let k=0;k<9;k++){c.beginPath();c.ellipse(x+(rnd(k*11)-.5)*sr*1.3,sy+(rnd(k*13)-.5)*srY*1.2,R*.03,R*.015,0,0,7);c.fill()}}
- if(s.fluff){c.fillStyle='rgba(255,255,255,.5)';for(let k=0;k<6;k++){c.beginPath();c.ellipse(x+(rnd(k*17)-.5)*sr,sy+(rnd(k*19)-.5)*srY,R*.15,R*.05,rnd(k),0,7);c.fill()}}
- c.restore();g=c.createLinearGradient(0,iy-iRY,0,iy);g.addColorStop(0,'rgba(0,0,0,.25)');g.addColorStop(1,'rgba(0,0,0,0)');c.strokeStyle='#f6f7f9';c.lineWidth=R*.025;c.beginPath();c.ellipse(x,iy,ir*.975,iRY*.965,0,0,7);c.stroke();
- if(s.p>.6&&s.phase!=='prep'&&s.rest<200)steam(c,x,iy,R,.8,t)}
+function dgOpen(c,s,x,y,R,t,mini){const ck=s.phase!=='prep',im=L(ck?'v53_rice_cooked':'v53_inner_pot');if(!im.ok)return;const k=R*2/560,top=y-300*k,cy0=top+235*k,orx=R*1.13,ory=200*k,by=cy0+R*.62;
+ let g=c.createLinearGradient(x-orx,0,x+orx,0);g.addColorStop(0,'#7a1410');g.addColorStop(.3,'#d8402f');g.addColorStop(.45,'#f0705a');g.addColorStop(.7,'#c02a20');g.addColorStop(1,'#5a0e0a');
+ c.fillStyle='#b9bcc2';c.beginPath();c.ellipse(x,cy0,orx,ory,0,0,7);c.fill();c.fillStyle='#55585e';c.beginPath();c.ellipse(x,cy0,orx*.95,ory*.93,0,0,7);c.fill();
+ c.drawImage(im,x-R,top,R*2,544*k);
+ if(!ck){const fy=top+290*k,fr=190*k,fry=95*k,fill=cl(.25+(s.iw||0)*.07,0,.8),sy=fy-fill*70*k;c.save();c.beginPath();c.ellipse(x,fy-fill*35*k,fr*1.08,fry*1.25,0,0,7);c.clip();riceBed(c,s,x,sy+12*k,fr*1.05,fry*.95,mini);
+  const wl=s.iw/s.rice;if(wl>0){const cloud=s.washes<3?.5-.15*s.washes:0;c.fillStyle=`rgba(${225-cloud*20|0},${235-cloud*25|0},${242-cloud*40|0},${Math.min(.75,.25+wl*.2+cloud)})`;c.fillRect(x-R,fy-R,R*2,R*2);c.strokeStyle='rgba(255,255,255,.5)';c.lineWidth=1.5;c.beginPath();c.ellipse(x-R*.1,sy,R*.25,fry*.12,0,0,7);c.stroke()}c.restore()}
+ c.fillStyle=g;c.beginPath();c.ellipse(x,cy0,orx,ory,0,0,Math.PI);c.lineTo(x-orx*.93,by);c.ellipse(x,by,orx*.93,ory*.8,0,Math.PI,0,true);c.closePath();c.fill();
+ c.strokeStyle='#d9dce1';c.lineWidth=R*.035;c.beginPath();c.ellipse(x,cy0,orx,ory,0,0,Math.PI);c.stroke();c.strokeStyle='rgba(255,255,255,.22)';c.lineWidth=R*.03;c.beginPath();c.ellipse(x,cy0+R*.2,orx*.98,ory,0,Math.PI*.15,Math.PI*.85);c.stroke();
+ if(!mini){const p2=L(ck?'v53_paddle':'v53_cup');if(p2.ok){const w=R*(ck?.75:.6);c.save();c.translate(x+R*1.32,y+R*.35);if(ck)c.rotate(-.5);c.drawImage(p2,-w/2,-w/2,w,w*p2.naturalHeight/p2.naturalWidth);c.restore()}}
+ if(ck&&s.rest<200)steam(c,x,top+200*k,R,.6,t)}
 function cooker(c,s,x,y,R,t,mini){
  if(s.kind==='dg'&&((s.phase==='prep'&&!s.closed)||s.peek))return dgOpen(c,s,x,y,R,t,mini);
  if((s.phase==='prep'&&!(s.kind==='dg'&&s.closed))||s.peek){const RY=R*.5;c.fillStyle=s.kind==='dg'?'#c8322a':'#f4f2ee';c.beginPath();c.ellipse(x,y,R*1.05,RY*1.05,0,0,7);c.fill();c.fillStyle='#9ea2a8';c.beginPath();c.ellipse(x,y,R*.93,RY*.91,0,0,7);c.fill();
@@ -404,7 +397,7 @@ function wokMini(c,s,x,y,R,t,mini){const RY=R*.64,g=G&&G.chal&&!G.done?G:null,he
 function drawSt(c,s,x,y,R,t,mini){const k=s.kind;if(k==='pot'||k==='fryer'||k==='potrice')pot(c,s,x,y,R,t,mini);else if(k==='pan')pan(c,s,x,y,R,t,mini);else if(k==='dg'||k==='ec')cooker(c,s,x,y,R,t,mini);else if(k==='oven')oven(c,s,x,y,R,t,mini);else if(k==='wok')wokMini(c,s,x,y,R,t,mini)}
 /* v5.2 tactile FX layer */
 const FX=[];const now=()=>performance.now()/1000;
-function fx(o){o.t0=now()+(o.delay||0);FX.push(o);return o}
+function fx(o){if(o.k==='ladle')for(let i=FX.length-1;i>=0;i--)if(FX[i].k==='ladle')FX.splice(i,1);o.t0=now()+(o.delay||0);FX.push(o);return o}
 const LQ={water:'#d8ecff',coldw:'#d8ecff',oil:'#f2c94c',oilf:'#f2c94c',lard:'#f8f0d8',soy:'#3a1a08',soysc:'#2a1206',wine:'#f4ead0',slurry:'#f4f0e6',slurry2:'#f4f0e6',slurry1:'#f4f0e6',egg:'#ffcf3a',eggw:'#ffcf3a',eggp:'#ffcf3a',bonito:'#e8c890',vinegar:'#3a2010',sesoil:'#c8862a',sauce:'#c8382a',rwine:'#f4ead0'};
 function addFX(s,id,el){const it=I5[id],r=kc.getBoundingClientRect();let sx=KW/2,sy=KH+30,img=null;
  if(el){const b=el.getBoundingClientRect();sx=b.left+b.width/2-r.left;sy=b.top+b.height/2-r.top;img=el.querySelector('img')}
@@ -672,7 +665,7 @@ function evalSt(s,id){const tp=[];let sc=100;const P=(p,m,t='qual')=>{sc-=p;tp.p
   if(k==='ec'&&s.mode==='quick')V('快煮模式：省時間，米粒稍硬一點。');if(!s.fluff)S('煮好後用飯匙由底翻鬆，散出多餘水氣。')}
  else if(s.cg){if(!s.riceIn)return{score:0,safe:false,tips:[{p:100,msg:'米還沒下鍋。',t:'qual'}]};const r=(s.wAdd||0)/(s.rice*180);
   if(r<7)P(14,`水太少（米水約 1:${r.toFixed(1)}），粥會變成稠飯、容易黏底。`);else if(r>12)P(12,`水太多（米水約 1:${r.toFixed(1)}），粥太稀。`);else if(r<8||r>10)V(`米水 1:${r.toFixed(1)}：偏${r<8?'稠':'稀'}，也是常見口味（常見 1:8～1:10）。`);else tp.push({msg:`米水 1:${r.toFixed(1)} 剛好。`,t:'good'});
-  if(s.p<.7)P(18,'米粒還沒開花，米心偏硬。');else if(s.p<.95)P(7,'再多煮一下，米粒開花才會綿。');else if(s.thick>1.5)P(8,'太稠、快乾了：起鍋前補一點熱水攪勻。');else if(s.thick<.6)P(6,'米湯太稀，再小火多煮一下收稠。');else tp.push({msg:'米粒開花、粥體綿滑。',t:'good'});
+  if(s.p<.7)P(18,'米粒還沒開花，米心偏硬。');else if(s.p<.95)P(7,'再多煮一下，米粒開花才會綿。');else if(s.thick>1.45)P(8,'太稠、快乾了：起鍋前補一點熱水攪勻。');else if(s.thick<.6)P(6,'米湯太稀，再小火多煮一下收稠。');else tp.push({msg:'米粒開花、粥體綿滑。',t:'good'});
   if(s.crust>1)P(Math.min(20,Math.round(8+s.crust*6)),'鍋底燒焦：粥會帶焦味。小火、每隔一陣子從鍋底翻攪。');else if(s.stick>.8||s.crust>.2)P(5,'鍋底開始黏了，要從底部攪起來。');
   if(!s.nStir)P(6,'整鍋都沒攪：米會沉底黏鍋。');if(s.coldIn)V('冷水下米也可以，只是要多攪幾次防黏；滾水下米比較不黏底。');
   if((s.cgBig||0)>300)P(5,'一直大滾：粥會溢、米粒容易煮散，滾了就轉最小火。');if(s.dish==='cgsp'){if(!has('spot'))P(15,'沒有地瓜。');else if(minC('spot')<.9)P(8,'地瓜還沒煮鬆軟。')}
