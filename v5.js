@@ -12,6 +12,7 @@ const I5={
  laver:{n:'紫菜',ic:'v5_laver',m:10,need:20,mode:'boil',sh:'sheet',k:9,col0:'#2a1e2e',col1:'#1e3a2a',tint:[40,60,40,.12]},
  egg:{n:'蛋液',ic:'egg',m:110,pour:1,svg:1},
  ribs:{n:'排骨',ic:'v5_ribs',m:400,need:2700,mode:'boil',sh:'rib',k:7,foam:1,fat:1,safe:1,col0:'#d98a86',col1:'#c7a68a',tint:[230,210,170,.18]},
+ spot:{n:'地瓜塊',ic:'sweetpot',m:250,need:1200,mode:'boil',col0:'#f2b45a',col1:'#f39a2c'},
  corn:{n:'玉米',ic:'v5_corn',m:300,need:900,mode:'boil',sh:'corn',k:5,col0:'#f8d84a',col1:'#f2c636',tint:[250,220,120,.12]},
  tofu:{n:'豆腐',ic:'v5_tofu',m:200,need:120,mode:'boil',sh:'cube',k:10,col0:'#f6f1e2',col1:'#f2ead4'},
  wakame:{n:'海帶芽',ic:'v5_wakame',m:8,need:30,mode:'boil',sh:'sheet',k:8,col0:'#2f6a2a',col1:'#2a7a34'},
@@ -45,6 +46,8 @@ function icon(id){const it=I5[id];if(it.svg){try{return svg(it.ic)}catch(e){}}re
 const D5={
  ricedg:{n:'電鍋白飯',cat:'rice',lv:'簡單',img:'v5d_rice_bowl',st:[['dg','電鍋']]},
  riceec:{n:'電子鍋白飯',cat:'rice',lv:'簡單',img:'v5d_rice_bowl',st:[['ec','電子鍋']]},
+ cgw:{n:'白粥',cat:'rice',lv:'中等',img:'v5d_rice_bowl',st:[['potrice','湯鍋',['salt']]]},
+ cgsp:{n:'地瓜粥',cat:'rice',lv:'中等',img:'v5d_rice_bowl',st:[['potrice','湯鍋',['spot','salt']]]},
  ricepot:{n:'鍋煮白飯',cat:'rice',lv:'中等',img:'v5d_rice_bowl',st:[['potrice','湯鍋']]},
  souptom:{n:'番茄蛋花湯',cat:'soup',lv:'簡單',img:'v5d_soup_tomato_egg',st:[['soup','湯鍋',['oil','tomato','water','salt','egg','scallion','sesoil']]]},
  souplav:{n:'紫菜蛋花湯',cat:'soup',lv:'簡單',img:'v5d_soup_laver_egg',st:[['soup','湯鍋',['water','laver','salt','pepper','egg','scallion','sesoil']]]},
@@ -79,7 +82,7 @@ function mkSt(kind,name,tray,o={}){const s={kind,name,tray:tray||[],heat:0,out:0
  if(kind==='potrice')Object.assign(s,{rice:2,washes:0,abs:0,p:0,crust:0,rest:0,fluff:0,riceIn:0,w0:0,cap:2600});
  if(kind==='oven')Object.assign(s,{set:180,To:24,on:0,door:0,opens:0,yolks:null,past:null,coats:0,sesame:0,elem:0});
  return s}
-const solid=s=>s.items.reduce((a,i)=>a+(I5[i.id].m||0),0)+(s.kind==='potrice'&&s.riceIn?s.rice*150+s.abs:0);
+const solid=s=>s.items.reduce((a,i)=>a+(I5[i.id].m||0),0)+(s.kind==='potrice'&&s.riceIn?(s.cg?s.rice*150:s.rice*150+s.abs):0);
 const C0=s=>700+s.W*4.18+s.O*2+solid(s)*3.5;
 const rateBoil=T=>T>=97?1:T>=85?(T-80)/17:T>=70?.12:0;
 const rateFry=T=>Math.max(0,(T-105)/65);
@@ -134,7 +137,18 @@ function ckUpd(s,dt){
    if(s.progT>=dur){s.phase='rest';s.t0=K.t;s.p=Math.max(s.p,1);s.rest=s.mode==='quick'?300:600;sfx('ding',.6)}}
   else if(s.phase==='rest')s.rest+=dt}
  s.alarm=0;s.warn=0}
-function potRiceUpd(s,dt){potUpd(s,dt);
+function cgUpd(s,dt){potUpd(s,dt);if(!s.riceIn){s.sfoam=0;return}const r=s.rice*180;
+ if(s.T>85&&s.W>8){const tgt=r*4,ab=Math.min(s.W,dt*.0012*(tgt-s.abs)*(s.T-80)/20);s.abs+=Math.max(0,ab);s.W-=Math.max(0,ab)}
+ if(s.T>=95)s.p+=dt/2100*(.75+.35*Math.min(1,s.bi*2));
+ s.thick=cl(Math.min(1.2,s.p)*(r*6.3)/(s.W+s.abs+1),0,1.6);s.visc=Math.min(1,s.thick*.8);
+ s.sfoam=s.W>8?cl((.25+.5*s.thick)*s.bi*(s.lid?2.4:1),0,.8):0;
+ const since=K.t-s.stirT;if(s.p>.03&&s.heat&&s.T>=95){if(since>45)s.stick+=dt*Math.pow(s.heat,1.6)*(.25+s.thick)/700;if(s.stick>1)s.crust+=dt*(s.stick-1)*s.heat/260}
+ if(s.W<=8&&s.heat){s.crust+=dt/120}s.scorch=Math.max(0,s.crust-1)*.8;
+ if(s.bi>.7)s.cgBig=(s.cgBig||0)+dt;
+ if(s.lid&&s.bi>.6&&s.W>8){s.bo=(s.bo||0)+dt*(s.bi-.6)*s.heat/1.5}else s.bo=Math.max(0,(s.bo||0)-dt*3);s.sfoam=Math.max(s.sfoam,cl((s.bo||0)/25,0,1));
+ if(s.bo>25){s.spill=1;s.ev.spill=1;s.spillT+=dt;s.W=Math.max(0,s.W-dt*2.5);s.puddle=cl(s.puddle+dt*.01);if(s.spillT>25&&!s.out&&s.heat){s.out=1;s.ev.out=(s.ev.out||0)+1;sfx('fry',.6,.7);K&&K.douse(s)}}else{s.spill=0;s.spillT=Math.max(0,s.spillT-dt*.5)}
+ s.warn=s.stick>.8||s.bo>15?1:0;s.alarm=s.alarm||s.crust>1?1:0}
+function potRiceUpd(s,dt){if(s.cg)return cgUpd(s,dt);potUpd(s,dt);
  if(s.riceIn){if(s.T>70&&s.W>0){const tgt=s.rice*180*1.15;const ab=Math.max(0,Math.min(s.W,dt*.12*(s.T-60)/40*(tgt-s.abs)/tgt*3));s.abs+=ab;s.W-=ab}
   if(s.T>=95)s.p+=dt/780*(s.W>8?1:.7);
   if(s.W<=8&&s.heat&&s.T>110){s.crust+=dt*(s.T-110)/900;s.scorch=Math.max(0,s.crust-1)*.8}
@@ -180,8 +194,11 @@ function wisp(c,x,y,R,a,t,spread,col,sp,n0,mini){a=Math.min(1.3,a);if(!(a>0))ret
   c.strokeStyle=`rgba(${col},${.2*al})`;if(!mini){c.shadowColor=`rgba(${col},${.4*al})`;c.shadowBlur=R*.1}c.lineWidth=R*(.025+.1*ph);
   c.beginPath();for(let q=0;q<=9;q++){const u=q/9,yy=y-ph*h*.5-u*h*.42*(.6+.4*ph),xx=x0+Math.sin(u*5.5+t*1.6+k*1.3)*R*(.02+.11*u*(.3+ph))+u*R*.18*(rnd(k*3.7)-.5);q?c.lineTo(xx,yy):c.moveTo(xx,yy)}c.stroke()}
  c.restore()}
-function smoke(c,x,y,R,a,t){wisp(c,x,y,R,cl(a)*1.2,t,.9,'60,56,52',.3,10)}
-function steam(c,x,y,R,a,t,spread=1.2,mini){wisp(c,x,y,R,a,t,spread,'255,255,255',.28,8,mini)}
+function smoke(c,x,y,R,a,t){wisp(c,x,y,R,cl(a)*1.1,t,.9,'120,115,110',.3,10)}
+function steam(c,x,y,R,a,t,spread=1.2,mini){a=Math.min(1.3,a);if(!(a>0))return;const n=mini?4:Math.ceil(10*Math.min(1,a))+2;c.save();
+ for(let k=0;k<n;k++){const ph=(t*.32+rnd(k*3.1))%1,x0=x+(rnd(k*5.1)-.5)*R*spread+Math.sin(t*1.3+k)*R*.06*ph,yy=y-ph*R*1.3,rad=R*(.08+.28*ph),al=Math.min(1,a)*.22*Math.sin(ph*Math.PI);if(al<.01)continue;
+  const g=c.createRadialGradient(x0,yy,0,x0,yy,rad);g.addColorStop(0,`rgba(255,255,255,${al})`);g.addColorStop(.6,`rgba(255,255,255,${al*.45})`);g.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=g;c.beginPath();c.arc(x0,yy,rad,0,7);c.fill()}
+ c.restore();wisp(c,x,y,R,a*.6,t,spread,'255,255,255',.28,5,mini)}
 function liqCol(s){let r=232,g=238,b=240,a=.35;const m=cc=>{const w=cc[3];r+=(cc[0]-r)*w;g+=(cc[1]-g)*w;b+=(cc[2]-b)*w;a=Math.min(.95,a+w*.6)};
  s.addLog.forEach(id=>{const it=I5[id];if(it.col)m(it.col)});s.items.forEach(i=>{const it=I5[i.id];if(it.tint)m([it.tint[0],it.tint[1],it.tint[2],it.tint[3]*cl(i.c+.2)]);if(it.col)m(it.col)});
  if(s.miso)m([190,140,70,.55]);if(s.flecks)m([240,220,150,.3]);if(s.lumps)m([200,170,150,.2]);a=Math.min(.97,a+s.visc*.6);
@@ -213,6 +230,16 @@ function shape(c,it,i,x,y,sz,t){const d=cl(i.c,0,2.2),col=mix(it.col0||'#ccc',it
  default:c.beginPath();c.arc(0,0,sz*.5,0,7);c.fill()}
  c.restore()}
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+function cgBed(c,s,x,y,R,RY,t,mini){const th=cl(s.thick||0,0,1.3),b=cl(s.p,0,1.2),sc=cl(s.crust/2);
+ const g=c.createRadialGradient(x-R*.2,y-RY*.2,R*.05,x,y,R*.95);g.addColorStop(0,mix('#e8eef0','#fbf8ef',cl(th)));g.addColorStop(1,mix('#c9d3d6','#ece4d0',cl(th)));c.globalAlpha=.35+.6*cl(th*1.2);c.fillStyle=g;c.beginPath();c.ellipse(x,y,R*.95,RY*.9,0,0,7);c.fill();c.globalAlpha=1;
+ const n=mini?60:260;for(let k=0;k<n;k++){const a=rnd(k*1.7)*6.28+(s.bi>.05?Math.sin(t*1.5+k)*.03*s.bi:0),r2=Math.sqrt(rnd(k*2.9))*.9,gx=x+Math.cos(a)*R*r2,gy=y+Math.sin(a)*RY*r2,sz=R*.032*(1+b*.9);
+  c.globalAlpha=(.45+.4*b)*(1-cl(th-.6)*.5);c.fillStyle=mix('#eae4d2','#fffdf6',cl(b));c.beginPath();c.ellipse(gx,gy,sz,sz*(.42+.2*b),a*2,0,7);c.fill();
+  if(b>.6&&k%3===0){c.fillStyle='rgba(255,255,255,.8)';c.beginPath();c.ellipse(gx+sz*.6,gy,sz*.5*(b-.5),sz*.35,a*2+1,0,7);c.fill()}}c.globalAlpha=1;
+ const items=s.items.filter(i=>i.id==='spot');items.forEach(i=>{for(let n=0;n<10;n++){const sd=i.seed+n*1.3,a=rnd(sd)*6.28,r2=Math.sqrt(rnd(sd+2))*.7,px=x+Math.cos(a)*R*.9*r2,py=y+Math.sin(a)*RY*.8*r2,z=R*.075,cc=cl(i.c);c.save();c.translate(px,py+Math.sin(t*1.2+n)*s.bi*2);c.rotate(rnd(sd+5)*3);
+  c.fillStyle=mix('#f2b45a','#f39a2c',cc);rr(c,-z,-z*.7,z*2,z*1.4,z*.35);c.fill();c.fillStyle=mix('#ffd58a','#ffbc58',cc);rr(c,-z*.8,-z*.65,z*1.6,z*.5,z*.25);c.fill();c.fillStyle='#8a3b2a';c.fillRect(-z,z*.55,z*2,z*.15);c.restore()}});
+ if(s.bi>.02&&!mini){for(let k=0;k<Math.ceil(4+s.bi*10);k++){const ph=(t*(.6+(1-cl(th))*1.2)+rnd(k*7))%1,bx=x+(rnd(k*3.3+Math.floor(t*.6+rnd(k)))-.5)*R*1.4,by=y+(rnd(k*4.1+Math.floor(t*.6+rnd(k)))-.5)*RY*1.2,rr2=R*(.02+.05*cl(th))*Math.sin(ph*Math.PI);
+  c.strokeStyle=`rgba(255,255,255,${.7*(1-ph)})`;c.fillStyle=`rgba(255,253,245,${.5*(1-ph)})`;c.lineWidth=1.2;c.beginPath();c.arc(bx,by,rr2,0,7);c.fill();c.stroke()}}
+ if(sc>0){c.fillStyle=`rgba(120,80,30,${.35*sc})`;for(let k=0;k<12;k++){c.beginPath();c.ellipse(x+(rnd(k*9)-.5)*R*1.3,y+(rnd(k*8)-.5)*RY,R*.03,R*.015,0,0,7);c.fill()}}}
 function riceBed(c,s,x,y,R,RY,mini){const done=cl(s.p);for(let k=0;k<(mini?110:380);k++){const a=rnd(k*1.7)*6.28,r2=Math.sqrt(rnd(k*2.9));c.fillStyle=mix(s.washes<2&&done<.1?'#ece6d6':'#f2eee2','#fdfdfa',done);c.globalAlpha=.55+.45*done;c.beginPath();c.ellipse(x+Math.cos(a)*R*r2,y+Math.sin(a)*RY*r2,R*.05*(1+done*.4),R*.022*(1+done*.4),a,0,7);c.fill()}c.globalAlpha=1}
 function pot(c,s,x,y,R,t,mini){const BR=s.kind==='pot'&&(s.name==='滷鍋'||s.name==='燉鍋'),G=BR?{im:'st_braise_pot',cx:298,cy:262,rx:205,ry:128,w:600,h:572,fy:38,frx:170,fry:95,sy:1.42}:{im:'st_pot',cx:260,cy:122,rx:188,ry:116,w:520,h:358,fy:66,frx:140,fry:60,sy:1.12};const k=R/G.rx,RY=G.ry*k,im=L(G.im),heat=s.out?0:s.heat;stove(c,x,y+R*G.sy,R*.95,s,t);
  if(im.ok){c.save();c.shadowColor='rgba(60,30,10,.35)';c.shadowBlur=mini?3:18;c.shadowOffsetY=mini?2:10;c.drawImage(im,x-G.cx*k,y-G.cy*k,G.w*k,G.h*k);c.restore()}
@@ -225,8 +252,8 @@ function pot(c,s,x,y,R,t,mini){const BR=s.kind==='pot'&&(s.name==='滷鍋'||s.na
  const fill=cl(s.fill||0,0,1.05),fu=Math.min(1,fill),fy=y+G.fy*k,lvl=f=>({ly:fy+(y-fy)*f,LR:R*(G.frx/G.rx+(.95-G.frx/G.rx)*f),LRY:G.fry*k+(RY*.93-G.fry*k)*f}),Lv=lvl(fu),ly=Lv.ly;
  s.fmax=Math.max((s.fmax||0)*.99995,fu);if(s.fmax-fu>.05&&(s.W>8)){const M=lvl(s.fmax);c.strokeStyle=`rgba(${tc[0]*.55|0},${tc[1]*.5|0},${tc[2]*.45|0},.45)`;c.lineWidth=R*.018;c.beginPath();c.ellipse(x,M.ly,M.LR,M.LRY,0,Math.PI*.05,Math.PI*.95,true);c.stroke()}
  {const R=Lv.LR/.95,RY=Lv.LRY/.9;
- if(s.kind==='potrice'&&s.riceIn){riceBed(c,s,x,ly+RY*.05,R*.85,RY*.75,mini);if(s.W<=8&&s.p>.5){c.fillStyle='rgba(110,100,80,.45)';for(let k=0;k<8;k++){c.beginPath();c.ellipse(x+(rnd(k*11)-.5)*R*1.2,ly+(rnd(k*13)-.5)*RY,R*.03,R*.016,0,0,7);c.fill()}}}
- if(s.W>8||s.O>0){c.fillStyle=`rgba(${tc[0]|0},${tc[1]|0},${tc[2]|0},${s.kind==='potrice'?Math.min(.6,s.W/300):tc[3]})`;c.beginPath();c.ellipse(x,ly,R*.95,RY*.9+(s.bi>.6?Math.sin(t*9)*(s.bi-.6)*R*.02:0),0,0,7);c.fill();
+ if(s.kind==='potrice'&&s.riceIn&&s.cg){cgBed(c,s,x,ly,R,RY,t,mini)}else if(s.kind==='potrice'&&s.riceIn){riceBed(c,s,x,ly+RY*.05,R*.85,RY*.75,mini);if(s.W<=8&&s.p>.5){c.fillStyle='rgba(110,100,80,.45)';for(let k=0;k<8;k++){c.beginPath();c.ellipse(x+(rnd(k*11)-.5)*R*1.2,ly+(rnd(k*13)-.5)*RY,R*.03,R*.016,0,0,7);c.fill()}}}
+ if(s.W>8||s.O>0){c.fillStyle=`rgba(${tc[0]|0},${tc[1]|0},${tc[2]|0},${s.kind==='potrice'?(s.cg&&s.riceIn?0:Math.min(.6,s.W/300)):tc[3]})`;c.beginPath();c.ellipse(x,ly,R*.95,RY*.9+(s.bi>.6?Math.sin(t*9)*(s.bi-.6)*R*.02:0),0,0,7);c.fill();
   c.globalCompositeOperation='lighter';for(let k=0;k<3;k++){const ph=t*.4+k*2.1;c.fillStyle=`rgba(255,255,255,${.06+.03*Math.sin(ph*2)})`;c.beginPath();c.ellipse(x+Math.sin(ph)*R*.3-R*.2,ly-RY*.3+Math.cos(ph*.7)*RY*.15,R*(.18+.06*k),RY*.08,-.15,0,7);c.fill()}c.globalCompositeOperation='source-over'}
  s.items.forEach(i=>{const it=I5[i.id];if(!it.sh)return;const kk=mini?Math.ceil(it.k/2):it.k;for(let n=0;n<kk;n++){const sd=i.seed+n*1.37,a=rnd(sd)*6.28,r2=Math.sqrt(rnd(sd+2))*.8,fl=(s.bi*.9+.05)*t*.6*(r2<.5?1:-.6);
   const px=x+Math.cos(a+fl)*R*.8*r2,py=ly+Math.sin(a+fl)*RY*.72*r2+Math.sin(t*3+sd)*RY*.02*(1+s.bi*3);shape(c,it,{...i,seed:sd},px,py,R*(it.sh==='strand'?.13:it.sh==='bits'?.05:.085)*(mini?1.15:1),t);
@@ -306,7 +333,25 @@ function pan(c,s,x,y,R,t,mini){const RY=R*.45,PY=R*.58,heat=s.out?0:s.heat;stove
  if(s.pieces.length)tofuDraw(c,s,x,y,R,RY,t,mini);
  c.restore();if((ck||s.pieces.length)&&s.T>120&&!mini)steam(c,x,y,R,cl((s.T-120)/80)*.6,t);if(s.smoke>0)smoke(c,x,y,R,s.smoke,t);
  if(s.lid){c.fillStyle='rgba(220,230,240,.35)';c.beginPath();c.ellipse(x,y-R*.02,R*.95,PY*.92,0,0,7);c.fill();c.strokeStyle='#c8ccd2';c.lineWidth=R*.03;c.stroke();c.fillStyle='#333';c.beginPath();c.ellipse(x,y-R*.06,R*.1,R*.05,0,0,7);c.fill()}}
+function dgOpen(c,s,x,y,R,t,mini){const RY=R*.42,ty=y-R*.18,by=y+R*.62;
+ /* outer red body, 3/4 view */let g=c.createLinearGradient(x-R*1.1,0,x+R*1.1,0);g.addColorStop(0,'#7a1410');g.addColorStop(.3,'#d8402f');g.addColorStop(.45,'#f0705a');g.addColorStop(.7,'#c02a20');g.addColorStop(1,'#5a0e0a');c.fillStyle=g;c.beginPath();c.moveTo(x-R*1.08,ty);c.lineTo(x-R*1.0,by);c.ellipse(x,by,R*1.0,RY*.95,0,Math.PI,0,true);c.lineTo(x+R*1.08,ty);c.closePath();c.fill();
+ c.fillStyle='rgba(0,0,0,.18)';c.beginPath();c.ellipse(x,by,R*1.0,RY*.95,0,0,Math.PI);c.fill();
+ c.strokeStyle='rgba(255,255,255,.22)';c.lineWidth=R*.03;c.beginPath();c.ellipse(x,ty+R*.16,R*1.07,RY*1.02,0,Math.PI*.15,Math.PI*.85);c.stroke();
+ /* steel rim + outer cavity */c.fillStyle='#c9ccd2';c.beginPath();c.ellipse(x,ty,R*1.08,RY*1.03,0,0,7);c.fill();g=c.createLinearGradient(0,ty-RY,0,ty+RY);g.addColorStop(0,'#5d6168');g.addColorStop(1,'#a9adb4');c.fillStyle=g;c.beginPath();c.ellipse(x,ty,R*.97,RY*.92,0,0,7);c.fill();
+ if(s.ow>0){c.fillStyle='rgba(205,228,240,.55)';c.beginPath();c.ellipse(x,ty+RY*.25,R*.9,RY*.7,0,0,7);c.fill()}
+ /* inner pot: steel cylinder sitting in the cavity, rim slightly proud */const ir=R*.78,iRY=RY*.78,iy=ty-R*.06,dep=R*.3;c.save();c.beginPath();c.ellipse(x,ty,R*.97,RY*.92,0,0,7);c.rect(x-R*2,ty-R*2,R*4,R*2);c.clip();
+ g=c.createLinearGradient(x-ir,0,x+ir,0);g.addColorStop(0,'#7c8088');g.addColorStop(.35,'#eef0f3');g.addColorStop(.6,'#b8bcc3');g.addColorStop(1,'#6a6e76');c.fillStyle=g;c.beginPath();c.moveTo(x-ir,iy);c.lineTo(x-ir,iy+dep*1.6);c.ellipse(x,iy+dep*1.6,ir,iRY,0,Math.PI,0,true);c.lineTo(x+ir,iy);c.closePath();c.fill();c.restore();
+ c.fillStyle='#e4e6ea';c.beginPath();c.ellipse(x,iy,ir,iRY,0,0,7);c.fill();
+ /* inside: back wall then lower surface */c.save();c.beginPath();c.ellipse(x,iy,ir*.95,iRY*.93,0,0,7);c.clip();g=c.createLinearGradient(0,iy-iRY,0,iy+iRY);g.addColorStop(0,'#70747c');g.addColorStop(.6,'#c4c8ce');g.addColorStop(1,'#9a9ea6');c.fillStyle=g;c.fillRect(x-R,iy-R,R*2,R*2);
+ c.strokeStyle='rgba(40,44,52,.6)';c.lineWidth=1.2;for(let k=1;k<=5;k++){const ly=iy-iRY*.93+k*dep*.13;c.beginPath();c.moveTo(x+ir*.12,ly);c.lineTo(x+ir*.26,ly);c.stroke()}
+ const fill=cl(.35+(s.phase==='prep'?(s.iw||0)*.08:.25),0,.85),sy=iy+dep*(1-fill),sr=ir*.94,srY=iRY*.9;c.beginPath();c.ellipse(x,sy,sr,srY,0,0,7);c.clip();c.fillStyle='#8a8e96';c.fillRect(x-R,sy-R,R*2,R*2);riceBed(c,s,x,sy,sr*.98,srY*.96,mini);
+ const wl=s.phase==='prep'?s.iw/s.rice:0;if(wl>0){const cloud=s.washes<3?.5-.15*s.washes:0;c.fillStyle=`rgba(${232-cloud*20|0},${238-cloud*25|0},${242-cloud*40|0},${Math.min(.8,.28+wl*.22+cloud)})`;c.fillRect(x-R,sy-R,R*2,R*2);c.strokeStyle='rgba(255,255,255,.45)';c.lineWidth=1.5;c.beginPath();c.ellipse(x-R*.12,sy-srY*.25,R*.28,srY*.08,0,0,7);c.stroke()}
+ if(s.p>.6&&s.phase!=='prep'){c.fillStyle='rgba(110,100,80,.35)';for(let k=0;k<9;k++){c.beginPath();c.ellipse(x+(rnd(k*11)-.5)*sr*1.3,sy+(rnd(k*13)-.5)*srY*1.2,R*.03,R*.015,0,0,7);c.fill()}}
+ if(s.fluff){c.fillStyle='rgba(255,255,255,.5)';for(let k=0;k<6;k++){c.beginPath();c.ellipse(x+(rnd(k*17)-.5)*sr,sy+(rnd(k*19)-.5)*srY,R*.15,R*.05,rnd(k),0,7);c.fill()}}
+ c.restore();g=c.createLinearGradient(0,iy-iRY,0,iy);g.addColorStop(0,'rgba(0,0,0,.25)');g.addColorStop(1,'rgba(0,0,0,0)');c.strokeStyle='#f6f7f9';c.lineWidth=R*.025;c.beginPath();c.ellipse(x,iy,ir*.975,iRY*.965,0,0,7);c.stroke();
+ if(s.p>.6&&s.phase!=='prep'&&s.rest<200)steam(c,x,iy,R,.8,t)}
 function cooker(c,s,x,y,R,t,mini){
+ if(s.kind==='dg'&&((s.phase==='prep'&&!s.closed)||s.peek))return dgOpen(c,s,x,y,R,t,mini);
  if((s.phase==='prep'&&!(s.kind==='dg'&&s.closed))||s.peek){const RY=R*.5;c.fillStyle=s.kind==='dg'?'#c8322a':'#f4f2ee';c.beginPath();c.ellipse(x,y,R*1.05,RY*1.05,0,0,7);c.fill();c.fillStyle='#9ea2a8';c.beginPath();c.ellipse(x,y,R*.93,RY*.91,0,0,7);c.fill();
   if(s.kind==='dg'&&s.ow>0){c.fillStyle='rgba(200,225,240,.75)';c.beginPath();c.ellipse(x,y,R*.92,RY*.9,0,0,7);c.fill()}
   const ir=s.kind==='dg'?.72:.86;c.fillStyle='#d8dce2';c.beginPath();c.ellipse(x,y,R*ir,RY*ir,0,0,7);c.fill();c.save();c.beginPath();c.ellipse(x,y+RY*.04,R*ir*.94,RY*ir*.9,0,0,7);c.clip();c.fillStyle='#8a8e96';c.fillRect(x-R,y-R,R*2,R*2);
@@ -410,7 +455,7 @@ function drawFX(c,s,x,y,R,t){const T=now();
   else if(f.k==='tap'){c.strokeStyle=`rgba(255,255,255,${.7*(1-p)})`;c.lineWidth=3;c.beginPath();c.arc(f.x,f.y,8+30*p,0,7);c.stroke()}
   c.restore()}}
 
-const TS={r:L('v52_tofu_raw'),s:L('v52_tofu_seared'),c:L('v52_tofu_sauced')};
+const TS={r:L('v52_tofu_raw'),s:L('v52_tofu_seared'),c:L('v53_tofu_sauced')};
 function TSok(){return TS.r.complete&&TS.r.naturalWidth&&TS.s.complete&&TS.s.naturalWidth&&TS.c.complete&&TS.c.naturalWidth}
 function tofuSpr(c,face,sa,w,ah,sy,j){const W2=w*2.5,H2=W2*.83,fy=Math.max(.2,Math.abs(sy));c.save();c.scale(1,fy*1.0);if(sy<0)c.scale(1,-1);
  const dx=-W2/2,dy=-H2*.5;c.drawImage(TS.r,dx,dy,W2,H2);
@@ -495,7 +540,7 @@ function ctl(){const s=cur();const b=(id,l,on)=>`<button data-a="${id}" class="$
  else if(['pot','fryer','potrice','pan'].includes(s.kind)){h=`<div class="heat">${[0,1,2,3].map(v=>`<button data-h="${v}" class="${s.heat===v?'on':''}">${['關火','小火','中火','大火'][v]}</button>`).join('')}</div>`;
   if(s.kind!=='fryer')h+=b('lid',s.lid?'掀蓋':'蓋鍋蓋');if(s.kind==='pot'||s.kind==='potrice')h+=b('stir','攪拌');if(s.kind==='pot')h+=b('skim','撈浮沫');
   if(s.kind==='fryer')h+=b('chop','插筷子')+b('lift','撈起')+b('mix','離火拌醬');if(s.kind==='pan')h+=b('flip','翻面');
-  if(s.kind==='potrice')h+=(s.riceIn?'':b('wash','洗米')+b('addr','米下鍋'))+b('w+','加水')+b('w-','倒掉些水')+b('fluff','翻鬆')}
+  if(s.kind==='potrice')h+=(s.riceIn?'':b('wash','洗米')+b('addr','米下鍋'))+b('w+',s.cg?'加一杯水':'加水')+b('w-','倒掉些水')+(s.cg?'':b('fluff','翻鬆'))}
  else if(s.kind==='dg'||s.kind==='ec'){h=s.phase==='prep'&&s.kind==='dg'?(s.closed?b('lid','打開鍋蓋')+b('go','按下開關'):b('wash','洗米')+b('iw+','內鍋加水')+b('iw-','倒掉些水')+b('ow+','外鍋加水')+b('lid','蓋上鍋蓋')):s.phase==='prep'?b('wash','洗米')+b('iw+','內鍋加水')+b('iw-','倒掉些水')+(s.kind==='dg'?b('ow+','外鍋加水'):b('mode',s.mode==='quick'?'快煮':'標準',1))+b('go',s.kind==='dg'?'按下開關':'開始煮飯'):
   (s.kind==='dg'&&s.phase==='rest'?b('ow+','外鍋加水')+b('go','再按一次'):'')+b('peek',s.peek?'蓋上':'開蓋看看')+b('fluff','翻鬆')}
  else if(s.kind==='oven')h=b('pwr',s.on?'關烤箱':'開烤箱',s.on)+b('t-','溫度−')+b('t+','溫度＋')+b('door',s.door?'關門':'開門',s.door)+b('wrap','包餡')+b('in','放入')+b('out','取出');
@@ -531,15 +576,15 @@ function ovAdd(s,id){if(id==='yolk')s.yolks={c:0,wine:0,inOven:0};else if(id==='
 function act(a){const s=cur();audio();try{actFX(s,a)}catch(e){}
  if(a==='ff')return K.skip(600);
  if(a==='lid'){if(s.kind==='dg'){s.closed=!s.closed;sfx('click',.5,.7);return ctl()}s.lid=!s.lid;if(!s.lid&&(s.T>90||s.riceIn&&s.p<1))s.lidOpens++;sfx('click',.4,.8);return ctl()}
- if(a==='stir'){s.stirT=K.t;sfx('stir',.4);if(s.egg&&s.egg.t<5){s.ribbons.forEach(r=>{if(r.set<.6)r.broken=1});s.flecks=1}if(s.slurryT!=null)s.slurryStir=1;if(s.kind==='potrice'&&s.riceIn&&s.p>.15)s.stirRice=(s.stirRice||0)+1;return}
+ if(a==='stir'){s.stirT=K.t;sfx('stir',.4);if(s.egg&&s.egg.t<5){s.ribbons.forEach(r=>{if(r.set<.6)r.broken=1});s.flecks=1}if(s.slurryT!=null)s.slurryStir=1;if(s.kind==='potrice'&&s.riceIn&&s.p>.15)s.stirRice=(s.stirRice||0)+1;if(s.cg&&s.riceIn){s.nStir=(s.nStir||0)+1;s.stick=Math.max(0,s.stick-.9)}return}
  if(a==='skim'){if(s.foam>.02){s.foam*=.4;s.skims=(s.skims||0)+1;sfx('stir',.3,.7)}return}
  if(a==='chop'){s.chop=1;s.chopAt=K.t;setTimeout(()=>s.chop=0,2500);return}
  if(a==='lift'){s.shrimp.forEach(x=>{if(x.in){x.in=0;x.out=K.t;s.rack.push(x)}});s.shrimp=s.shrimp.filter(x=>x.in);sfx('stir',.4);return}
  if(a==='mix'){if(!s.rack.length){ktoast('還沒撈起蝦');return}s.sauce={at:K.t,hot:s.rack.some(x=>K.t-x.out<45),pine:!!s.used.pineapple,mayo:!!s.used.mayo};sfx('stir',.4);return}
  if(a==='flip'){const ps=s.cake?[s.cake]:s.pieces;if(!ps.length)return;ps.forEach(p=>{p.up=1-p.up;p.fl=.001;p.flips++});if(s.cake)s.items.forEach(i=>i.inCake=1);sfx('stir',.5,1.2);return}
  if(a==='wash'){if(s.kind==='wok'){s.dirty=0;sfx('stir',.5,.8);K.skip(60);return ctl()}s.washes++;sfx('stir',.4,.9);return}
- if(a==='addr'){s.riceIn=1;s.w0=s.W;s.r0=s.W/(s.rice*180);return ctl()}
- if(a==='w+'){const c0=C0(s);s.W+=36;s.T=(s.T*c0+22*150)/(c0+150);return}if(a==='w-'){s.W=Math.max(0,s.W-36);return}
+ if(a==='addr'){s.riceIn=1;s.w0=s.W;s.r0=s.W/(s.rice*180);if(s.cg){s.coldIn=s.T<90;s.stirT=K.t-40;sfx('drop',.6)}return ctl()}
+ if(a==='w+'){const c0=C0(s),dw=s.cg?180:36;s.wAdd=(s.wAdd||0)+dw;s.W+=dw-36;s.T=(s.T*c0+22*(dw-36))/(c0+dw-36+.01);s.T=(s.T*c0+22*150)/(c0+150);return}if(a==='w-'){const dw=s.cg?90:36;s.wAdd=Math.max(0,(s.wAdd||0)-dw);s.W=Math.max(0,s.W-dw);return}
  if(a==='iw+'){s.iw=Math.round((s.iw+.1)*10)/10;return}if(a==='iw-'){s.iw=Math.max(0,Math.round((s.iw-.1)*10)/10);return}
  if(a==='ow+'){s.ow=Math.round((s.ow+.25)*100)/100;sfx('drop',.3);return}
  if(a==='mode'){s.mode=s.mode==='quick'?'std':'quick';return ctl()}
@@ -625,6 +670,13 @@ function evalSt(s,id){const tp=[];let sc=100;const P=(p,m,t='qual')=>{sc-=p;tp.p
   if(s.phase==='rest'&&K.t-s.t0<480&&k==='dg')P(4,'跳起後沒燜就開：再燜 10–15 分鐘米粒更均勻。');
   if(s.lidOpens)P(Math.min(6,2*s.lidOpens),'煮的中途掀蓋，熱氣跑掉。');if(!s.washes)V('沒洗米：免洗米可以不洗，一般米輕洗 2–3 次口感較清爽。');
   if(k==='ec'&&s.mode==='quick')V('快煮模式：省時間，米粒稍硬一點。');if(!s.fluff)S('煮好後用飯匙由底翻鬆，散出多餘水氣。')}
+ else if(s.cg){if(!s.riceIn)return{score:0,safe:false,tips:[{p:100,msg:'米還沒下鍋。',t:'qual'}]};const r=(s.wAdd||0)/(s.rice*180);
+  if(r<7)P(14,`水太少（米水約 1:${r.toFixed(1)}），粥會變成稠飯、容易黏底。`);else if(r>12)P(12,`水太多（米水約 1:${r.toFixed(1)}），粥太稀。`);else if(r<8||r>10)V(`米水 1:${r.toFixed(1)}：偏${r<8?'稠':'稀'}，也是常見口味（常見 1:8～1:10）。`);else tp.push({msg:`米水 1:${r.toFixed(1)} 剛好。`,t:'good'});
+  if(s.p<.7)P(18,'米粒還沒開花，米心偏硬。');else if(s.p<.95)P(7,'再多煮一下，米粒開花才會綿。');else if(s.thick>1.5)P(8,'太稠、快乾了：起鍋前補一點熱水攪勻。');else if(s.thick<.6)P(6,'米湯太稀，再小火多煮一下收稠。');else tp.push({msg:'米粒開花、粥體綿滑。',t:'good'});
+  if(s.crust>1)P(Math.min(20,Math.round(8+s.crust*6)),'鍋底燒焦：粥會帶焦味。小火、每隔一陣子從鍋底翻攪。');else if(s.stick>.8||s.crust>.2)P(5,'鍋底開始黏了，要從底部攪起來。');
+  if(!s.nStir)P(6,'整鍋都沒攪：米會沉底黏鍋。');if(s.coldIn)V('冷水下米也可以，只是要多攪幾次防黏；滾水下米比較不黏底。');
+  if((s.cgBig||0)>300)P(5,'一直大滾：粥會溢、米粒容易煮散，滾了就轉最小火。');if(s.dish==='cgsp'){if(!has('spot'))P(15,'沒有地瓜。');else if(minC('spot')<.9)P(8,'地瓜還沒煮鬆軟。')}
+  if(!s.washes)V('不洗也可以；洗米輕拌 2–3 次就好，留點表面澱粉粥才會稠。');else if(s.washes>3)V('洗太多次會洗掉表面澱粉，粥比較不稠。');}
  else if(k==='potrice'){if(!s.riceIn)return{score:0,safe:false,tips:[{p:100,msg:'米還沒下鍋。',t:'qual'}]};rice(s.r0,1.2,1.5,1.25,1.4);
   if(s.p<.95)P(15,'飯還沒熟，米心硬。');if(s.crust>1)P(Math.min(18,Math.round(s.crust*8)),'鍋底燒焦：滾了以後要轉最小火、蓋蓋。');else if(s.crust>.3)V('鍋底有一層鍋巴，香脆，也可以。');
   if(s.lidOpens>1)P(Math.min(6,2*(s.lidOpens-1)),'燜煮中常掀蓋，蒸氣跑掉，飯會夾生。');if(s.stirRice>2)P(5,'米下鍋滾後一直攪，飯會黏糊。');if(s.rest<500)P(3,'關火後再燜 10–15 分鐘，米粒才會均勻熟透。');if(!s.fluff)S('燜好打開翻鬆再盛。')}
@@ -696,7 +748,7 @@ $('#again').onclick=()=>{if(V5last&&$('#rname').textContent===V5last.n){startV5(
 $('#share').onclick=async()=>{if(!(V5last&&$('#rname').textContent===V5last.n))return oShare();const {id,n,score,stars:s}=V5last;const url=location.href.split('#')[0]+`#c=${id}-${score}`;
  const text=`我在「熱炒小廚房」做了${n}，拿到 ${score} 分 ${'★'.repeat(s)}${'☆'.repeat(3-s)}\n敢來挑戰嗎？`;
  try{if(navigator.share){await navigator.share({title:'熱炒小廚房',text,url});return}}catch(e){return}try{await navigator.clipboard.writeText(text+'\n'+url);toastR('已複製挑戰連結')}catch(e){prompt('複製這段分享：',text+'\n'+url)}};
-function startV5(id){K=null;G=null;FX.length=0;if(id==='chal')return startChal();K=makeK(D5[id],null);K.id=id;K.st.forEach((s,i)=>s.dish=SUB[id]?SUB[id][i][0]:id);G=null;openKit()}
+function startV5(id){K=null;G=null;FX.length=0;if(id==='chal')return startChal();K=makeK(D5[id],null);K.id=id;K.st.forEach((s,i)=>{s.dish=SUB[id]?SUB[id][i][0]:id;if(id==='cgw'||id==='cgsp')Object.assign(s,{cg:1,rice:1,cap:2200,stick:0,thick:0})});G=null;openKit()}
 window.V5={start:id=>{audio();startV5(id)},tick,wokServe,back};
 window.__v5={get K(){return K},I5,D5,evalSt,step:sec=>K.skip(sec),act,add,cur,finishChal,focus,serveSt:()=>$('#kserve').onclick()};
 parseHash();home();

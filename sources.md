@@ -70,3 +70,8 @@
 - 滷肉飯、大腸麵線、牛肉麵（紅燒/清燉）、蚵仔煎、香煎豆腐：做法與時間參考 ai-v5b-chatgpt.md（主要）與 ai-v5b-gemini.md（清燉、切法與替代食材），以常見食譜交叉比對；燉滷時間在遊戲內以 SIM=6 加速並可 ⏩ 跳 10 分鐘。
 ## 音效授權
 - assets/sfx/*.mp3 均取自 Pixabay（Pixabay Content License：可免費商用/非商用、免署名；不得單獨轉售音檔）。原始檔名：household-boiling-water-30521、nature-boiling-water-69115、household-gas-stove-ignition-493874、household-igniting-gas-stove-304948、household-cracking-egg-44884、household-whisking-eggs-298083、household-stirring-food-105749、household-frying-pan-01-497227、household-cooking-frying-1-71871、film-special-effects-frying-pan-hot-sizzle-loop-1-200912、film-special-effects-pan-frying-noise-259550、film-special-effects-wooden-spatula-30885、household-vegetable-chopping-on-a-wooden-cutting-board-436104、household-cut-vegetables-and-fruits-221532、household-overn-timer-ding-78204、household-switch-click-and-beep-001a-11602、placing-plate-on-hard-table-sequence-449928、film-special-effects-level-complete-143022、film-special-effects-level-passed-143039（https://pixabay.com/sound-effects/ ，授權 https://pixabay.com/service/license-summary/ ）。載入失敗時改用 WebAudio 合成音。
+
+## 煮粥（白粥／地瓜粥，v5.3）
+- 米水比約 1:8–1:10；水先煮滾再下米，回滾後攪開、轉最小火；鍋蓋留縫防溢；每 5–10 分鐘從鍋底攪；小火 35–40 分鐘至米粒開花：https://charwok.com/cn/congee/ 、https://redhousespice.com/congee/
+- 洗米別過度以保留表面澱粉；地瓜切塊與米同煮至軟：https://food.ltn.com.tw/article/3237
+- 煮粥防溢與糊底注意事項：https://care.fh21.com.cn/view/8075262.html
