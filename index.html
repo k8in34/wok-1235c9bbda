@@ -123,11 +123,11 @@ h3.cat{margin:14px 2px 8px;font-size:16px;color:#ffcf8a}
   <div class="top">
    <button class="ib" id="back" aria-label="返回"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg></button>
    <div class="ttl" id="ttl"></div>
-   <div class="clock" id="clock">0:00</div>
+   <div class="clock" id="clock">下鍋 0:00</div>
    <button class="ib" id="mute" aria-label="靜音"></button>
   </div>
-  <div class="steps" id="steps"></div>
-  <div id="stage"><canvas id="wokc"></canvas><div class="toast" id="toast"></div><div class="chips" id="chips"></div></div>
+  
+  <div id="stage"><canvas id="wokc"></canvas><div class="toast" id="toast"></div></div>
   <div class="ctrl">
    <div class="heat" id="heat">
     <button data-h="0"><svg viewBox="0 0 24 24" width="20"><circle cx="12" cy="12" r="8" stroke="#ccc" stroke-width="2.5" fill="none"/><path d="M12 4v8" stroke="#ccc" stroke-width="2.5"/></svg>關火</button>
@@ -354,8 +354,8 @@ function newGame(r){
 const isReq=id=>G.r.req.includes(id)||(G.r.any&&G.r.any[0].includes(id));
 const isOpt=id=>G.r.opt&&id in G.r.opt;
 // tier: 'safe' 食安 | 'qual' 品質 ; style choices never go through penal()
-function penal(p,msg,key,ids=[],tier='qual'){if(G.pen.some(x=>x.key===key))return;G.pen.push({p,msg,key,ids,tier});toast(msg+(p?`（-${p}）`:''),'bad')}
-function softTip(msg){if(!G.soft.includes(msg)){G.soft.push(msg);toast('建議：'+msg.slice(0,18)+'…')}}
+function penal(p,msg,key,ids=[],tier='qual'){if(G.pen.some(x=>x.key===key))return;G.pen.push({p,msg,key,ids,tier});}
+function softTip(msg){if(!G.soft.includes(msg)){G.soft.push(msg)}}
 let toastT;function toast(m,c=''){const t=$('#toast');t.textContent=m;t.className='toast on '+c;clearTimeout(toastT);toastT=setTimeout(()=>t.className='toast',2400)}
 const effLo=p=>ING[p.id].flip?Math.min(p.d,p.d2):p.d, effHi=p=>ING[p.id].flip?Math.max(p.d,p.d2):p.d;
 function meanLo(id){const ps=G.pieces.filter(p=>p.id===id);return ps.length?ps.reduce((a,p)=>a+effLo(p),0)/ps.length:-1}
@@ -365,14 +365,14 @@ function addIng(id){
  if(G.added.includes(id)){toast('已經下過'+ING[id].n+'了');return}
  const I=ING[id],r=G.r;let praised=false;
  // ---- STYLE: accepted variation, never penalized ----
- if(isOpt(id)&&r.opt[id]){G.vars.push(r.opt[id]);toast('常見做法：'+I.n+' ✓','good');praised=true}
+ if(isOpt(id)&&r.opt[id]){G.vars.push(r.opt[id]);praised=true}
  else if(!isReq(id)&&!isOpt(id)) penal(3,`${I.n}在這道菜比較少見`,'x'+id,[id]);
  // ---- QUALITY: real technique rules ----
  if(r.fat!==0&&!G.oil&&['main','aroma','veg'].includes(I.type)&&!I.pool) penal(10,`還沒下油就下${I.n}，會黏鍋、容易焦`,'nooil',[id]);
  (r.gate||[]).forEach(g=>{if(g.id===id){const m=meanLo(g.on);if(m<g.min)penal(g.p,g.msg,'g'+id,[id])}});
  (r.soft||[]).forEach(([a,b,msg])=>{if(b===id&&!G.added.includes(a)&&r.steps.includes(a))softTip(msg)});
  if(r.hot&&I.type==='main'&&G.temp<.35&&G.oil)softTip('鍋還不夠熱就下料，容易出水、黏鍋；等油面出現波紋再下。');
- G.order[id]=G.added.length;G.added.push(id);
+ if(G.t0==null)G.t0=G.t;G.order[id]=G.added.length;G.added.push(id);
  // ---- physical effect ----
  const hot=G.temp>.35&&(G.oil||I.type==='oil');
  if(I.type==='oil'){G.oil=1;G.oilType=id;if(G.temp>.3)burst(.25,.5)}
@@ -386,11 +386,13 @@ function addIng(id){
   if(hot){burst(.8,1);for(let i=0;i<18;i++)spawn('splash')}else clank();
  }
  if(hot&&I.type!=='oil')for(let i=0;i<12;i++)spawn('steam');
- if(!praised&&isReq(id)&&!G.pen.some(p=>p.ids.includes(id))) toast(['好！','漂亮！','香！','不錯'][Math.random()*4|0],'good');
  renderSteps();renderTray();renderChips();
 }
-function stir(){if(!G||G.done)return;audio();G.lastStir=G.t;G.toss=1;
- G.pieces.forEach(p=>{const I=ING[p.id];if(I.pool)return;if(I.flip){const t=p.d;p.d=p.d2;p.d2=t;p.vy=-1.4;p.vr=0;return}p.vy=-(1.2+Math.random()*1.4);p.vr=(Math.random()-.5)*8;p.bot=Math.random()<.45});
+function whoosh(){if(!AC)return;const s=AC.createBufferSource();s.buffer=noiseBuf;const f=AC.createBiquadFilter();f.type='bandpass';f.Q.value=1.2;const t=AC.currentTime;f.frequency.setValueAtTime(300,t);f.frequency.exponentialRampToValueAtTime(1800,t+.18);f.frequency.exponentialRampToValueAtTime(500,t+.4);const g=AC.createGain();g.gain.setValueAtTime(.001,t);g.gain.exponentialRampToValueAtTime(.5,t+.1);g.gain.exponentialRampToValueAtTime(.001,t+.45);s.connect(f);f.connect(g);g.connect(master);s.start(t);s.stop(t+.5)}
+function stir(){if(!G||G.done)return;audio();G.lastStir=G.t;G.toss=1;whoosh();
+ if(G.heat===3&&G.oil&&G.pieces.length){G.flare=1;for(let i=0;i<40;i++)spawn('flame')}
+ G.pieces.forEach(p=>{const I=ING[p.id];if(I.pool){p.vr=0;return}if(I.flip){const t=p.d;p.d=p.d2;p.d2=t;p.vy=-2.6;p.vr=0;p.fl=1;return}
+  p.vy=-(2.4+Math.random()*1.6);p.vx=(Math.random()-.5)*1.1-p.x*.35;p.sy=(Math.random()-.5)*.8-p.y*.3;p.vr=(Math.random()-.5)*14;p.fl=Math.random()<.5?1:0;p.bot=Math.random()<.45});
  const m={};G.pieces.forEach(p=>{if(!ING[p.id].flip)(m[p.id]=m[p.id]||[]).push(p.d)});
  G.pieces.forEach(p=>{const a=m[p.id];if(!a)return;const avg=a.reduce((x,y)=>x+y,0)/a.length;p.d+=(avg-p.d)*.25});
  if(G.pieces.length&&G.temp>.3)burst(.35,.4); else clank();
@@ -412,11 +414,13 @@ function update(dt){
   if(I.pool&&water)m*=.6;
   p.d+=dt*rate*dry*m/I.tp*(.9+p.seed*.2);
   if(I.flip&&p.d2>p.d)p.d2+=0; // top side doesn't cook
-  if(p.z<0||p.vy){p.vy+=dt*7;p.z+=p.vy*dt;if(p.z>0){p.z=0;p.vy=0}}
+  if(p.z<0||p.vy){p.vy+=dt*7;p.z+=p.vy*dt;if(p.vx){p.x+=p.vx*dt;p.y+=(p.sy||0)*dt}if(p.z>0){p.z=0;p.vy=0;p.vx=0;const r=Math.hypot(p.x,p.y/.9);if(r>.88){p.x*=.88/r;p.y*=.88/r}}}
+  if(p.fl>0)p.fl=Math.max(0,p.fl-dt*1.8);
+  if(!I.pool&&p.d>1.35&&p.d<1.75&&G.temp>.3&&Math.random()<dt*1.5)spawn('wisp',p);
   p.rot+=p.vr*dt;p.vr*=.96;
  });
  if(G.sugLiq){G.liqDry=(G.liqDry||0)+dt*rate*.06}
- G.toss=Math.max(0,G.toss-dt*2.5);
+ G.toss=Math.max(0,G.toss-dt*1.6);G.flare=Math.max(0,(G.flare||0)-dt*2);
  const burntN=G.pieces.filter(p=>p.d>1.6).length;
  if(G.temp>.3&&(G.pieces.length||G.liquid.length)&&Math.random()<dt*20*G.temp)spawn('steam');
  if(burntN&&Math.random()<dt*(6+burntN*1.5*(ING[G.pieces[0].id].k<4?6:1)))spawn('smoke');
@@ -429,12 +433,13 @@ function update(dt){
  const near=G.pieces.some(p=>p.d>1.3);
  if(AC){const act=(G.pieces.length?1:G.oil?.35:0)*Math.max(0,G.temp-.25)*1.4;sizzleG.gain.setTargetAtTime(Math.min(.35,act*.35)+(G.toss>.5&&G.temp>.3?.08:0),AC.currentTime,.1);fireG.gain.setTargetAtTime(G.heat*.06,AC.currentTime,.2);
   if(near&&G.temp>.4&&Math.random()<dt*5)burst(.18,.12)}
- if(burntN>0&&!G.warnB&&(burntN>2||G.pieces.length<4)){G.warnB=1;toast(G.r.ware==='pan'?'焦了！快翻面或轉小火':'焦了！快翻炒或轉小火','bad')}
- if(G.oil&&G.temp>.35&&!G.warnHot&&!G.pieces.length&&G.t>2){G.warnHot=1;toast('油紋出現了，可以下料','good')}
+ if(burntN>0&&!G.warnB&&(burntN>2||G.pieces.length<4)){G.warnB=1}
+ if(G.oil&&G.temp>.35&&!G.warnHot&&!G.pieces.length&&G.t>2){G.warnHot=1}
 }
 /* ============ PARTICLES ============ */
 let W=390,H=360,CX,CY,RX,RY;
-function spawn(k){const p={k};
+function spawn(k,src){const p={k};
+ if(k==='wisp'){Object.assign(p,{k:'smoke',x:CX+src.x*RX*.78,y:CY+RY*.1+src.y*RY*.62,vx:(Math.random()-.5)*8,vy:-20-Math.random()*15,l:1.2,L:1.6,r:4+Math.random()*4});G.parts.push(p);return}
  const a=Math.random()*Math.PI*2,r=Math.sqrt(Math.random());
  const bx=CX+Math.cos(a)*r*RX*.75,by=CY+Math.sin(a)*r*RY*.6;
  if(k==='steam'){Object.assign(p,{x:bx,y:by,vx:(Math.random()-.5)*12,vy:-30-Math.random()*40,l:1.6+Math.random(),L:2.4,r:10+Math.random()*14})}
@@ -455,15 +460,31 @@ function pieceColor(I,d){if(d<1)return mix(I.raw,I.done,d);if(d<1.35)return mix(
 function mix2(a,b,t){const s=mix(a,b,t);const m=s.match(/\d+/g).map(Number);return'#'+m.map(v=>v.toString(16).padStart(2,'0')).join('')}
 function drawPiece(c,p,x,y,sc){const I=ING[p.id];const sp=SPR[p.id];
  if(sp&&IMG[sp[0]].ok&&VAR[sp[0]]){const raw=IMG[sp[0]],ck=sp[1]&&IMG[sp[1]].ok?IMG[sp[1]]:null,ckN=ck?sp[1]:sp[0];
-  const lvl=I.flip?(p.d2||0):p.d,lo=Math.max(p.d,I.flip?(p.d2||0):0);
-  const big=I.pool?2.6:I.flip?2.3:2.4,s=I.sz*p.s*sc*big,ar=raw.naturalHeight/raw.naturalWidth;
-  c.save();c.translate(x,y);c.rotate(I.pool?0:p.rot*.5);c.scale(1,I.pool?.5:.82);
+  const fl=p.fl||0,lvl=I.flip?(fl>.5?p.d:(p.d2||0)):p.d,lo=Math.max(p.d,I.flip?(p.d2||0):0);
+  const big=I.pool?2.6:I.flip?2.3:2.4,ar=raw.naturalHeight/raw.naturalWidth;
+  const leafy=['cabbage','basil','holy','scallion','parsley'].includes(p.id),meat=['beef','chicken','pork','thigh'].includes(p.id);
+  const shr=leafy?1-.28*Math.max(0,Math.min(1.3,lvl-.2)):meat?1-.14*Math.min(1.3,lvl):p.id==='tomato'?1-.2*Math.min(1.4,lvl):p.id==='egg'?.85+.2*Math.min(1,lvl):1;
+  const s=I.sz*p.s*sc*big*shr;const R=k=>{const v=Math.sin(p.seed*997+k*78.2)*43758.5;return v-Math.floor(v)};
+  c.save();c.translate(x,y);c.rotate(I.pool?0:p.rot*.5);c.scale(1,(I.pool?.5:.82)*(fl?Math.max(.12,Math.abs(Math.cos(fl*Math.PI))):1));
   const dr=(im,a)=>{if(a<=0)return;c.globalAlpha=Math.min(1,a);c.drawImage(im,-s,-s*ar,s*2,s*2*ar)};
-  c.shadowColor='rgba(0,0,0,.35)';c.shadowBlur=4;c.shadowOffsetY=2;dr(raw,1);c.shadowColor='transparent';
-  if(ck)dr(ck,Math.min(1,lvl/.95));else dr(VAR[ckN].brown,Math.min(1,lvl)*.75);
-  if(ck&&lvl>1.1)dr(VAR[ckN].brown,(lvl-1.1)*1.5);
-  const ch=Math.max(0,(Math.max(lvl,I.flip?0:lo)-1.3)/.5);if(ch>0)dr(VAR[ckN].char,ch);
-  if(G&&G.oil&&!G.done&&p.seed>.45){c.globalAlpha=.22;c.fillStyle='#fff';c.beginPath();c.ellipse(-s*.25,-s*.3*ar,s*.35,s*.08,-.4,0,7);c.fill()}
+  // juices / syrup under
+  if(p.id==='tomato'&&lvl>.5){c.globalAlpha=Math.min(.6,(lvl-.5));c.fillStyle='#c8301c';c.beginPath();c.ellipse(0,s*.3*ar,s*1.1,s*.5*ar,0,0,7);c.fill()}
+  if(p.id==='sugarc'&&lvl>.2){const t=Math.min(1,(lvl-.2)/.4);c.globalAlpha=.5*t;c.fillStyle=mix('#fff6dc','#e0a040',Math.max(0,(lvl-.5)/.5));c.beginPath();c.ellipse(0,0,s*1.05,s*.8*ar,0,0,7);c.fill()}
+  c.shadowColor='rgba(0,0,0,.35)';c.shadowBlur=4;c.shadowOffsetY=2;
+  if(p.id==='sugarc')dr(raw,1-Math.min(1,lvl/.5));else dr(raw,1);c.shadowColor='transparent';
+  if(ck)dr(ck,p.id==='sugarc'?Math.max(0,(lvl-.45)/.4):Math.min(1,lvl/.95));else dr(VAR[ckN].brown,Math.min(1,lvl)*(p.id==='rice'?.35:p.id==='batter'?1.15:.75));
+  if(lvl>1.1)dr(VAR[ckN].brown,(lvl-1.1)*2);
+  // seared edges / browning spots
+  if(lvl>.8&&!I.pool){const n=meat?7:4;c.globalAlpha=Math.min(.75,(lvl-.8)*1.4);c.fillStyle=lvl>1.35?'#1a0e08':'#6a3412';
+   for(let i=0;i<n;i++){const a=R(i)*6.28,rr=s*(.3+.5*R(i+9));c.beginPath();c.ellipse(Math.cos(a)*rr,Math.sin(a)*rr*ar*.8,s*(.07+.08*R(i+3))*(1+Math.max(0,lvl-1.3)*3),s*.06*(1+Math.max(0,lvl-1.3)*3),a,0,7);c.fill()}}
+  const ch=Math.max(0,(Math.max(lvl,I.flip?0:lo)-1.3)/.45);if(ch>0)dr(VAR[ckN].char,ch);
+  // perfect window: glossy sheen + bright colour
+  const pw=lvl>.9&&lvl<1.3?1-Math.abs(lvl-1.1)/.2:0;
+  if(pw>0){c.globalCompositeOperation='lighter';c.globalAlpha=.18*pw;dr(raw,.18*pw);c.globalCompositeOperation='source-over';
+   c.globalAlpha=.55*pw;c.fillStyle='#fff';for(let i=0;i<3;i++){c.beginPath();c.ellipse((R(i+20)-.5)*s,(R(i+30)-.6)*s*ar*.8,s*.22,s*.05,-.4,0,7);c.fill()}}
+  else if(G&&G.oil&&!G.done&&p.seed>.45&&lvl<1.3){c.globalAlpha=.22;c.fillStyle='#fff';c.beginPath();c.ellipse(-s*.25,-s*.3*ar,s*.35,s*.08,-.4,0,7);c.fill()}
+  // pancake bubbles on raw top while bottom sets
+  if(p.id==='batter'&&lvl<.4&&p.d>.4){c.globalAlpha=Math.min(.8,(p.d-.4)*1.5);c.strokeStyle='#a8743a';c.lineWidth=1;for(let i=0;i<14;i++){const a=R(i)*6.28,rr=s*.7*Math.sqrt(R(i+40));c.beginPath();c.arc(Math.cos(a)*rr,Math.sin(a)*rr*ar*.7,1.2+R(i+5)*2,0,7);c.stroke()}}
   c.restore();return}
  const col=pieceColor(I,I.flip?(p.d2||0):p.d);const s=I.sz*p.s*sc;
  c.save();c.translate(x,y);c.rotate(p.rot);
@@ -513,7 +534,7 @@ function drawWok(){const c=cx,t=performance.now()/1000;
  g=c.createRadialGradient(W*.75,H*.08,10,W*.75,H*.08,W*.9);g.addColorStop(0,'rgba(255,240,200,.55)');g.addColorStop(1,'rgba(255,240,200,0)');c.fillStyle=g;c.fillRect(0,0,W,cy);
  g=c.createLinearGradient(0,cy,0,H);g.addColorStop(0,'#a8683a');g.addColorStop(.06,'#8a5230');g.addColorStop(1,'#5a3420');c.fillStyle=g;c.fillRect(0,cy,W,H-cy);
  c.fillStyle='rgba(255,220,170,.35)';c.fillRect(0,cy,W,3);c.strokeStyle='rgba(60,30,15,.25)';for(let y=cy+22;y<H;y+=26){c.beginPath();c.moveTo(0,y);c.bezierCurveTo(W*.3,y+4,W*.6,y-4,W,y+2);c.stroke()}}
- const ty=-Math.sin(G.toss*Math.PI)*14;
+ const tp=1-G.toss,ty=-Math.sin(G.toss*Math.PI)*16,tx=Math.sin(tp*Math.PI*2)*RX*.07*(G.toss>0),tilt=Math.sin(tp*Math.PI*2)*.09*(G.toss>0);
  // stove
  const sy=CY+RY*1.4;
  let g=c.createLinearGradient(0,sy,0,H);g.addColorStop(0,'#3a3a40');g.addColorStop(1,'#1a1a1e');c.fillStyle=g;c.beginPath();c.ellipse(CX,sy+10,RX*.8,RY*.7,0,0,7);c.fill();
@@ -527,7 +548,7 @@ function drawWok(){const c=cx,t=performance.now()/1000;
  c.globalCompositeOperation='source-over';
  // grate
  c.strokeStyle='#555';c.lineWidth=4;c.beginPath();c.moveTo(CX-RX*.6,sy-6);c.lineTo(CX+RX*.6,sy-6);c.stroke();
- c.save();c.translate(0,ty);
+ c.save();c.translate(CX+tx,CY+ty);c.rotate(tilt);c.translate(-CX,-CY);
  if(wareImg(c)){}else if(G.r.ware==='pan'){drawPan(c)}else{
  // handle (wood) right, helper handle left
  c.strokeStyle='#2a2a2e';c.lineWidth=9;c.lineCap='round';c.beginPath();c.moveTo(CX+RX*.95,CY+4);c.lineTo(CX+RX*1.12,CY-6);c.stroke();
@@ -558,6 +579,7 @@ function drawWok(){const c=cx,t=performance.now()/1000;
  ps.forEach(p=>{const x=CX+p.x*RX*.78,y=CY+RY*.1+p.y*RY*.62+p.z*RY*1.2;
   if(p.z<-.05){c.fillStyle='rgba(0,0,0,.2)';c.beginPath();c.ellipse(CX+p.x*RX*.78,CY+RY*.1+p.y*RY*.62,6,2,0,0,7);c.fill()}
   drawPiece(c,p,x,y,RX/165)});
+ if(G.flare>0){c.globalCompositeOperation='lighter';const g2=c.createRadialGradient(CX,CY-RY*.3,5,CX,CY-RY*.3,RX*.9);g2.addColorStop(0,`rgba(255,200,90,${.6*G.flare})`);g2.addColorStop(1,'rgba(255,80,0,0)');c.fillStyle=g2;c.beginPath();c.ellipse(CX,CY-RY*.5,RX*.9,RY*1.6,0,0,7);c.fill();c.globalCompositeOperation='source-over'}
  // rim highlight front
  c.strokeStyle='rgba(255,255,255,.25)';c.lineWidth=2;c.beginPath();c.ellipse(CX,CY,RX-2,RY-2,0,.2,Math.PI-.2);c.stroke();
  c.restore();
@@ -576,21 +598,21 @@ function drawWok(){const c=cx,t=performance.now()/1000;
 }
 /* ============ UI ============ */
 function heatIcon(){return'<svg viewBox="0 0 64 64"><path d="M32 6q16 20 12 32a12 12 0 0 1-24 0q-4-12 12-32z" fill="#ff7a2f"/><path d="M32 26q8 10 5 18a5 5 0 0 1-10 0q-2-8 5-18z" fill="#ffe08a"/></svg>'}
-function renderSteps(){const r=G.r;let firstPending=-1;
+function renderSteps(){return;const r=G.r;let firstPending=-1;
  $('#steps').innerHTML=r.steps.map((s,i)=>{let cls='',done=false;
   if(s==='heat'){done=G.firstHeatAt!==null}else done=G.added.includes(s);
   const bad=G.pen.some(p=>p.ids.includes(s));const op=r.opt&&s in r.opt;
   if(done)cls=bad?'bad':'ok';else if(firstPending<0){firstPending=i;cls='next'}
   return`<div class="st ${cls} ${s==='heat'?'hs':''} ${op?'op':''}"><i>${i+1}</i>${s==='heat'?heatIcon():svg(s)}<span>${s==='heat'?'熱鍋':ING[s].n}</span></div>`}).join('')}
 function renderTray(){$('#tray').innerHTML=G.r.trayShuffled.map(id=>`<div class="ing ${G.added.includes(id)?'used':''}" data-id="${id}">${svg(id)}<span>${ING[id].n}</span></div>`).join('')}
-function renderChips(){const ids=[...new Set(G.pieces.map(p=>p.id))];
+function renderChips(){return;const ids=[...new Set(G.pieces.map(p=>p.id))];
  $('#chips').innerHTML=ids.map(id=>`<div class="chip" data-c="${id}">${svg(id)}<div class="bar"><b></b></div></div>`).join('')}
-function updChips(){document.querySelectorAll('.chip').forEach(ch=>{const id=ch.dataset.c,ps=G.pieces.filter(p=>p.id===id);const m=ps.reduce((a,p)=>a+p.d,0)/ps.length;ch.querySelector('b').style.left=Math.min(100,m/2*100)+'%'})}
+function updChips(){return;document.querySelectorAll('.chip').forEach(ch=>{const id=ch.dataset.c,ps=G.pieces.filter(p=>p.id===id);const m=ps.reduce((a,p)=>a+p.d,0)/ps.length;ch.querySelector('b').style.left=Math.min(100,m/2*100)+'%'})}
 document.querySelectorAll('#heat button').forEach(b=>b.onclick=()=>{if(!G)return;audio();G.heat=+b.dataset.h;if(G.heat&&G.firstHeatAt===null){G.firstHeatAt=G.t;renderSteps()}setHeatUI();if(G.heat)clank()});
 function setHeatUI(){document.querySelectorAll('#heat button').forEach(b=>b.classList.toggle('on',+b.dataset.h===G.heat))}
 $('#stir').onclick=stir;
 // swipe on wok = stir
-let sw=null;cv.addEventListener('pointerdown',e=>{sw={x:e.clientX,y:e.clientY}});cv.addEventListener('pointermove',e=>{if(sw&&Math.hypot(e.clientX-sw.x,e.clientY-sw.y)>50){stir();sw=null}});addEventListener('pointerup',()=>sw=null);
+let sw=null;cv.addEventListener('pointerdown',e=>{sw={x:e.clientX,y:e.clientY}});cv.addEventListener('pointermove',e=>{if(sw&&(sw.y-e.clientY>35||Math.hypot(e.clientX-sw.x,e.clientY-sw.y)>60)){stir();sw=null}});addEventListener('pointerup',()=>sw=null);
 // tray drag / tap
 let drag=null;
 $('#tray').addEventListener('pointerdown',e=>{const el=e.target.closest('.ing');if(!el||el.classList.contains('used'))return;const id=el.dataset.id;
@@ -600,12 +622,14 @@ addEventListener('pointermove',e=>{if(!drag)return;if(!drag.moved&&Math.hypot(e.
 addEventListener('pointerup',e=>{if(!drag)return;const d=drag;drag=null;if(d.gh)d.gh.remove();
  if(!d.moved){addIng(d.id);return}
  const r=$('#stage').getBoundingClientRect();if(e.clientY>r.top&&e.clientY<r.bottom)addIng(d.id)});
+const TIME_SCALE=6; // 1 game second = 6 real-kitchen seconds
+function fmtClock(g){if(!g||g.t0==null)return'下鍋 0:00';const s=Math.floor((g.t-g.t0)*TIME_SCALE);return'下鍋 '+Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
 /* ============ LOOP ============ */
 let last=0;function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0)*TS.v;last=ts;
  if(G&&!G.done&&$('#cook').classList.contains('on')){
   // sub-step for big time scales
   let rem=dt;while(rem>0){const s=Math.min(.05,rem);update(s);rem-=s}
-  drawWok();updChips();const s=Math.floor(G.t);$('#clock').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+  drawWok();updChips();$('#clock').textContent=fmtClock(G)}
  requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 
@@ -707,7 +731,7 @@ function home(){show('home');G=null;
  $('#cards').innerHTML=CATS.map(([k,nm])=>`<h3 class="cat">${nm}</h3><div class="cards">`+RECIPES.filter(r=>r.cat===k).map(r=>`<button class="rc" data-r="${r.id}"><canvas></canvas><b>${r.n}</b><span class="lv">${r.lv}・${r.steps.length} 步</span>${best[r.id]!=null?`<span class="best">★ ${best[r.id]}</span>`:''}</button>`).join('')+'</div>').join('');
  document.querySelectorAll('.rc').forEach(b=>{thumb(b.querySelector('canvas'),RECIPES.find(r=>r.id===b.dataset.r));b.onclick=()=>start(b.dataset.r)})}
 function start(id){audio();const r=RECIPES.find(x=>x.id===id);r.trayShuffled=[...r.tray].sort(()=>Math.random()-.5);
- newGame(r);show('cook');$('#ttl').textContent=r.n;resize();setHeatUI();renderSteps();renderTray();renderChips();$('#clock').textContent='0:00';const sb=$('#stir');[...sb.childNodes].filter(n=>n.nodeType===3&&n.textContent.trim()).forEach(n=>n.textContent=r.req.some(i=>ING[i].flip)?'翻面':'翻炒');toast(r.hint||'先開火熱鍋 → 溫度過白線再下油')}
+ newGame(r);show('cook');$('#ttl').textContent=r.n;resize();setHeatUI();renderSteps();renderTray();renderChips();$('#clock').textContent='下鍋 0:00';const sb=$('#stir');[...sb.childNodes].filter(n=>n.nodeType===3&&n.textContent.trim()).forEach(n=>n.textContent=r.req.some(i=>ING[i].flip)?'翻面':'翻炒')}
 $('#back').onclick=()=>{if(AC){sizzleG.gain.value=0;fireG.gain.value=0}home()};
 $('#again').onclick=()=>start(G.r.id);
 $('#menu').onclick=home;
