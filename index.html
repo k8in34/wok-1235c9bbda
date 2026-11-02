@@ -765,9 +765,9 @@ function thumb(c,r){const im=loadImg('dish_'+r.id);if(!im.ok){im.addEventListene
  ps.sort(()=>Math.random()-.5);drawPlate(c.getContext('2d'),w,h,ps,r);G=fakeG}
 function home(){show('home');G=null;
  const ch=$('#chal');if(challenge){const r=RECIPES.find(x=>x.id===challenge.r);ch.style.display='block';ch.innerHTML=`朋友挑戰你：<b>${r.n}</b> 拿了 <b>${challenge.s}</b> 分，點下面的${r.n}來比！`}
- $('#cards').innerHTML=CATS.map(([k,nm])=>`<h3 class="cat">${nm}</h3><div class="cards">`+RECIPES.filter(r=>r.cat===k).map(r=>`<button class="rc" data-r="${r.id}"><canvas></canvas><b>${r.n}</b><span class="lv">${r.lv}${r.v5?"":"・"+r.steps.length+" 步"}</span>${best[r.id]!=null?`<span class="best">★ ${best[r.id]}</span>`:''}</button>`).join('')+'</div>').join('');
+ $('#cards').innerHTML=CATS.map(([k,nm])=>`<h3 class="cat">${nm}</h3><div class="cards">`+RECIPES.filter(r=>r.cat===k).map(r=>`<button class="rc${r.soon?' soon':''}" data-r="${r.id}"><canvas></canvas><b>${r.n}</b><span class="lv">${r.soon?'準備中':r.lv}${r.v5?"":"・"+r.steps.length+" 步"}</span>${best[r.id]!=null?`<span class="best">★ ${best[r.id]}</span>`:''}</button>`).join('')+'</div>').join('');
  const io=window.IntersectionObserver?new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);thumb(e.target.querySelector('canvas'),RECIPES.find(r=>r.id===e.target.dataset.r))}}),{rootMargin:'200px'}):null;
- document.querySelectorAll('.rc').forEach(b=>{if(io)io.observe(b);else thumb(b.querySelector('canvas'),RECIPES.find(r=>r.id===b.dataset.r));b.onclick=()=>start(b.dataset.r)})}
+ document.querySelectorAll('.rc').forEach(b=>{if(io)io.observe(b);else thumb(b.querySelector('canvas'),RECIPES.find(r=>r.id===b.dataset.r));b.onclick=()=>{if(b.classList.contains('soon'))return;start(b.dataset.r)}})}
 function start(id){audio();const r=RECIPES.find(x=>x.id===id);if(r.v5)return V5.start(id);r.trayShuffled=[...r.tray].sort(()=>Math.random()-.5);
  newGame(r);show('cook');$('#ttl').textContent=r.n;resize();setHeatUI();renderSteps();renderTray();renderChips();$('#clock').textContent='下鍋 0:00';const sb=$('#stir');[...sb.childNodes].filter(n=>n.nodeType===3&&n.textContent.trim()).forEach(n=>n.textContent=r.req.some(i=>ING[i].flip)?'翻面':'翻炒')}
 $('#back').onclick=()=>{if(window.V5&&V5.back())return;if(AC){sizzleG.gain.value=0;fireG.gain.value=0}home()};
