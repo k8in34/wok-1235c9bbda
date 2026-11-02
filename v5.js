@@ -118,12 +118,12 @@ function potUpd(s,dt){const P=s.out?0:PW[s.heat],C=C0(s),wet=s.W>8,h=wet?(s.lid?
  s.smoke=cl((s.scorch>.15?s.scorch:0)+(s.O>0&&!wet&&s.T>215?(s.T-215)/40:0),0,1.5);
  s.alarm=s.spill||s.out||s.smoke>.4||(s.kind==='fryer'&&s.T>215)?1:0;
  s.warn=(wet&&s.W<150&&s.heat&&s.kind!=='fryer')||(s.lvl>.9&&s.bi>.3)||s.smoke>.1?1:0}
-function panUpd(s,dt){const P=s.out?0:PW[s.heat];const m=s.pieces.length*60+(s.cake?300:0)+solid(s),C=900+s.O*2+m*3.2;
- s.T+=(P-5*(s.T-22)-(s.cake?220*s.cake.wet:0))*dt/C;s.T=Math.max(18,s.T);const fr=rateFry(s.T)*(s.O>0?1:.6);
+function panUpd(s,dt){const P=s.out?0:PW[s.heat];const m=s.pieces.length*60+(s.cake?260:0)+solid(s),C=900+s.O*2+m*3.2;
+ s.T+=(P-5*(s.T-22)-(s.cake?90*s.cake.wet:0))*dt/C;s.T=Math.max(18,s.T);const fr=rateFry(s.T)*(s.O>0?1:.6);
  if(s.cake)s.cake.wet=Math.max(0,s.cake.wet-dt*fr*.02);
  s.items.forEach(i=>{const it=I5[i.id];i.t+=dt;if(it.need)i.c+=dt*fr*(i.inCake?.5:1)/it.need});
  s.pieces.forEach(p=>{p.s[p.up?0:1]+=dt*fr/p.need;p.s[p.up?1:0]+=dt*fr*(s.lid?.25:.06)/p.need});
- if(s.cake){const c=s.cake;c.s[c.up?0:1]+=dt*fr/c.need;c.s[c.up?1:0]+=dt*fr*(s.lid?.45:.2)/c.need;if(c.egg!=null)c.egg+=dt*fr*(c.up?1:.35)/60}
+ if(s.cake){const c=s.cake;c.s[c.up?0:1]+=dt*fr/c.need;c.s[c.up?1:0]+=dt*fr*(s.lid?.8:.45)/c.need;if(c.egg!=null)c.egg+=dt*fr*(c.up?1:.35)/60}
  const mx=Math.max(0,...s.pieces.map(p=>Math.max(...p.s)),s.cake?Math.max(...s.cake.s):0);
  s.smoke=cl((mx>1.55?(mx-1.55)*2:0)+(s.T>230?(s.T-230)/40:0),0,1.5);s.alarm=s.smoke>.5||s.out?1:0;s.warn=mx>1.25||s.smoke>.1?1:0;if(s.out&&s.heat)s.gas+=dt}
 function fryUpd(s,dt){const n=s.shrimp.filter(x=>x.in&&x.c<1).length;s.T-=n*12*dt/C0(s);potUpd(s,dt);const T=s.T;
@@ -299,8 +299,8 @@ function pan(c,s,x,y,R,t,mini){const RY=R*.45,PY=R*.58,heat=s.out?0:s.heat;stove
  c.translate(x,y);c.scale(1,PY/RY);c.translate(-x,-y);
  if(s.O>0){c.fillStyle=`rgba(230,180,70,${.22+.08*Math.sin(t)})`;c.beginPath();c.ellipse(x+Math.sin(t*.3)*R*.05,y+RY*.1,R*.72,RY*.62,0,0,7);c.fill();c.globalCompositeOperation='lighter';for(let k=0;k<4;k++){const ph=t*.4+k*1.6;c.fillStyle='rgba(255,240,200,.07)';c.beginPath();c.ellipse(x+Math.sin(ph)*R*.35,y+Math.cos(ph*.8)*RY*.3,R*.15,RY*.05,0,0,7);c.fill()}c.globalCompositeOperation='source-over'}
  const ck=s.cake;
- if(ck){const bot=ck.s[ck.up?0:1],top=ck.s[ck.up?1:0],sd=ck.seed,CR=R*.64,E=.47;c.save();c.translate(x,y+RY*.05);if(ck.fl)c.scale(1,Math.max(.12,Math.abs(Math.cos(ck.fl*Math.PI))));
-  const eb=cl((bot-.3)/1.0),edge=bot>1.45?'#3a2010':mix('#f0e4c8','#a85a1c',eb);
+ if(ck){const btm=ck.s[ck.up?1:0],bot=Math.max(ck.s[ck.up?0:1],btm*.8),top=ck.s[ck.up?1:0],sd=ck.seed,CR=R*.64,E=.47;c.save();c.translate(x,y+RY*.05);if(ck.fl)c.scale(1,Math.max(.12,Math.abs(Math.cos(ck.fl*Math.PI))));
+  const eb=cl((btm-.3)/1.0),edge=btm>1.45?'#3a2010':mix('#f0e4c8','#a85a1c',eb);
   for(let q=0;q<(mini?30:110);q++){const a=rnd(q*1.7+sd)*6.28,r2=CR*(.9+.22*rnd(q*2.3+sd)),z=R*(.018+.034*rnd(q*3.1+sd));c.fillStyle=mix(edge,'#4a2208',rnd(q*5.3)*eb*.55);c.beginPath();c.ellipse(Math.cos(a)*r2,Math.sin(a)*r2*E,z,z*.6,a,0,7);c.fill()}
   if(eb>.12){c.fillStyle=`rgba(26,22,20,${.5+.4*eb})`;for(let q=0;q<(mini?8:46);q++){const a=rnd(q*9.7+sd)*6.28,r2=CR*(.94+.15*rnd(q*4.4+sd));c.beginPath();c.ellipse(Math.cos(a)*r2,Math.sin(a)*r2*E,R*.011*(1+rnd(q)),R*.007*(1+rnd(q+1)),a,0,7);c.fill()}}
   c.fillStyle=edge;c.beginPath();for(let q=0;q<48;q++){const a=q/48*6.28,r2=CR*(.92+.06*Math.sin(q*2.7+sd)+.04*rnd(q+sd));c.lineTo(Math.cos(a)*r2,Math.sin(a)*r2*E)}c.fill();
@@ -354,9 +354,14 @@ function waterSurf(c,x,sy,rx,ry,cloud,t,a0){/* translucent water surface with re
  c.restore();c.globalCompositeOperation='source-over';
  c.strokeStyle=`rgba(255,255,255,${.55*a0})`;c.lineWidth=Math.max(1,rx*.014);c.beginPath();c.ellipse(x,sy,rx,ry,0,Math.PI*1.08,Math.PI*1.92);c.stroke();
  c.fillStyle=`rgba(255,255,255,${.35*a0})`;c.beginPath();c.ellipse(x-rx*.35,sy-ry*.45,rx*.28,ry*.07,-.08,0,7);c.fill()}
-function pourStream(c,x0,y0,x1,y1,w,col,t){c.save();c.lineCap='round';c.strokeStyle=col;c.lineWidth=w;c.beginPath();c.moveTo(x0,y0);c.quadraticCurveTo(x0+(x1-x0)*.15,y0+(y1-y0)*.55,x1,y1);c.stroke();
- c.strokeStyle='rgba(255,255,255,.6)';c.lineWidth=w*.3;c.setLineDash([w*1.5,w*2]);c.lineDashOffset=-t*120;c.stroke();c.setLineDash([]);
- c.fillStyle=col;for(let q=0;q<6;q++){const a=rnd(q+Math.floor(t*14))*3.14+3.14;c.beginPath();c.arc(x1+Math.cos(a)*w*2.2,y1+Math.sin(a)*w*1.2,w*.35,0,7);c.fill()}c.restore()}
+function pourStream(c,x0,y0,x1,y1,w,col,t,amt){if(amt==null)amt=1;if(amt<=.02)return;const N=18,P=[],dx=x1-x0,dy=y1-y0;
+ for(let q=0;q<=N;q++){const u=q/N,px=x0+dx*(1-(1-u)*(1-u))*.999,py=y0+dy*u*u,tx=dx*2*(1-u),ty=dy*2*u,l=Math.hypot(tx,ty)||1,ww=w*amt*(.75+.45*u)*.5+Math.sin(t*25+u*12)*w*.04;P.push([px,py,-ty/l*ww,tx/l*ww])}
+ c.save();c.fillStyle=col;c.beginPath();P.forEach(([a,b,nx,ny])=>c.lineTo(a+nx,b+ny));for(let q=N;q>=0;q--){const[a,b,nx,ny]=P[q];c.lineTo(a-nx,b-ny)}c.closePath();c.fill();
+ c.strokeStyle='rgba(255,255,255,.65)';c.lineWidth=Math.max(1,w*amt*.18);c.setLineDash([w*1.2,w*1.6]);c.lineDashOffset=-t*160;c.beginPath();P.forEach(([a,b,nx,ny])=>c.lineTo(a+nx*.45,b+ny*.45));c.stroke();c.setLineDash([]);
+ c.strokeStyle=`rgba(255,255,255,${.7*amt})`;c.lineWidth=1.4;for(let k=0;k<2;k++){const ph=(t*2.5+k*.5)%1;c.beginPath();c.ellipse(x1,y1,w*(1+ph*3.5),w*(.35+ph*1.2),0,0,7);c.stroke()}
+ c.fillStyle=col;for(let q=0;q<7;q++){const ph=(t*3+rnd(q))%1,a=Math.PI+rnd(q*3+Math.floor(t*3+rnd(q)))*Math.PI;c.globalAlpha=1-ph;c.beginPath();c.arc(x1+Math.cos(a)*w*3*ph,y1+Math.sin(a)*w*2.2*Math.sin(ph*Math.PI),w*.22*amt+.8,0,7);c.fill()}c.restore()}
+function holdPour(c,x,y,R,rot,draw){/* hand gripping a vessel; draw(c) draws vessel centred at 0,0 */c.save();c.translate(x,y);c.rotate(rot);draw(c);c.restore();
+ const hx=x+Math.cos(rot)*R*.2,hy=y+Math.sin(rot)*R*.2;c.strokeStyle='#e0a888';c.lineWidth=R*.1;c.lineCap='round';c.beginPath();c.moveTo(hx,hy);c.lineTo(hx+R*.45,hy-R*.35);c.stroke();hand2(c,hx,hy,R/190,rot-1.4)}
 /* inner pot with contents; returns nothing. k: image scale, top: image top */
 function dgInner(c,s,x,top,k,t,mini,o){const ck=o.ck,im=L(ck?'v53_rice_cooked':'v53_inner_pot');if(!im.ok)return;c.drawImage(im,x-280*k,top,560*k,544*k);
  const fy=top+290*k,fr=190*k,fry=95*k,mk=M=>{const rx=(196+M*6)*k,ry=rx*.5;return{y:top+(198-M*12.4)*k+ry,rx,ry}};
@@ -381,28 +386,29 @@ function dgInner(c,s,x,top,k,t,mini,o){const ck=o.ck,im=L(ck?'v53_rice_cooked':'
   if(s.fluff){const gw=rx*1.5,cv=grainCv('cooked',gw);c.save();c.beginPath();c.ellipse(x,cy,rx,ry,0,0,7);c.clip();[[-.35,.05,.8],[.3,-.1,.75],[0,.25,.9]].forEach(([dx,dy,sc])=>c.drawImage(cv,x+dx*rx-gw*sc/2,cy+dy*ry-gw*sc*.4,gw*sc,gw*.62*sc));c.restore()}}}
 function dgFX(s,a){if(a==='swish'||a==='wash')anSet(s,'wash');else if(a==='iw+')anSet(s,'iw');else if(a==='ow+')anSet(s,'ow');else if(a==='lid'){if(!s.closed){anSet(s,'lidon');setTimeout(()=>sfx('plate',.8,.55),220)}}else if(a==='go'){anSet(s,'press');s.closed=1}else if(a==='peek'){if(!s.peek)anSet(s,'open')}else if(a==='fluff')anSet(s,'fluff');else return false;return true}
 function dgOpen(c,s,x,y,R,t,mini){const k=R*2/560,top0=y-300*k,cy0=top0+235*k,orx=R*1.13,ory=200*k,by=cy0+R*.62;
- const ck=s.phase!=='prep'&&s.p>.6,pw=s.phase==='prep'?an(s,'wash',3.6):-1,po=an(s,'open',2.2),pf=an(s,'fluff',1.8),pi=an(s,'iw',.7),pow=an(s,'ow',1.2);
+ const ck=s.phase!=='prep'&&s.p>.6,pw=s.phase==='prep'?an(s,'wash',3.6):-1,po=an(s,'open',2.2),pf=an(s,'fluff',1.8),pi=an(s,'iw',1.5),pow=an(s,'ow',1.5);
  let g=c.createLinearGradient(x-orx,0,x+orx,0);g.addColorStop(0,'#7a1410');g.addColorStop(.3,'#d8402f');g.addColorStop(.45,'#f0705a');g.addColorStop(.7,'#c02a20');g.addColorStop(1,'#5a0e0a');
  c.fillStyle='#b9bcc2';c.beginPath();c.ellipse(x,cy0,orx,ory,0,0,7);c.fill();c.fillStyle='#45484e';c.beginPath();c.ellipse(x,cy0,orx*.95,ory*.93,0,0,7);c.fill();
  if(s.ow>0){c.fillStyle='rgba(170,205,225,.5)';c.beginPath();c.ellipse(x,cy0+ory*.12,orx*.92,ory*.8,0,0,7);c.fill()}
  /* wash: lift + tilt inner pot */let lift=0,tilt=0,lev=s.phase==='prep'?s.iw/1.2:0,cloud=0,tum=0;
+ if(pw>.55&&!mini){const sx=x-R*1.45,sy=y+R*.95,a2=Math.min(1,(pw-.55)/.06)*(pw>.95?(1-pw)/.05:1);c.save();c.globalAlpha=a2;const g=c.createLinearGradient(sx,sy-R*.2,sx,sy+R*.2);g.addColorStop(0,'#d9dee3');g.addColorStop(1,'#8b949c');c.fillStyle=g;c.beginPath();c.ellipse(sx,sy,R*.55,R*.2,0,0,7);c.fill();c.fillStyle='#5d666e';c.beginPath();c.ellipse(sx,sy+R*.02,R*.45,R*.14,0,0,7);c.fill();c.fillStyle='#2d3338';c.beginPath();c.ellipse(sx+R*.05,sy+R*.05,R*.06,R*.025,0,0,7);c.fill();c.restore()}
  if(pw>=0){const wi=Math.max(0,(s.washes||1)-1),c0=Math.max(.15,.95-wi*.3);lift=Math.min(1,pw/.1)*(pw>.92?(1-pw)/.08:1);
   if(pw<.15){lev=2.6*pw/.15;cloud=c0*.2}else if(pw<.62){lev=2.6;cloud=c0*Math.min(1,(pw-.15)/.25);tum=1}else{const q=(pw-.62)/.3;tilt=Math.sin(Math.min(1,q)*Math.PI)*.5;lev=2.6*Math.max(0,1-q*1.15);cloud=c0*(1-q*.2)}}
  c.save();c.translate(0,-lift*R*.22);if(tilt){c.translate(x-R*.95,cy0);c.rotate(-tilt);c.translate(-(x-R*.95),-cy0)}
  dgInner(c,s,x,top0,k,t,mini,{ck,lev,cloud,tum});
  if(pw>.15&&pw<.62&&!mini){const a=(pw-.15)/.47*Math.PI*6,hx=x+Math.cos(a)*R*.35,hy=top0+262*k+Math.sin(a)*R*.12;c.strokeStyle='#e0a888';c.lineWidth=R*.2;c.lineCap='round';c.beginPath();c.moveTo(hx,hy-R*.3);c.lineTo(hx+R*.5,hy-R*1.1);c.stroke();hand2(c,hx,hy-R*.1,R/75,Math.cos(a)*.15);c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=1.5;for(let q=0;q<3;q++){c.beginPath();c.ellipse(hx,hy+R*.02,R*(.08+q*.06+(t*.3%.06)),R*(.03+q*.02),0,0,7);c.stroke()}}
  c.restore();
- if(pw>=0&&pw<.15&&!mini)pourStream(c,x-R*.55,top0-R*.6,x-R*.2,top0+250*k,R*.05,'rgba(215,236,255,.85)',t);
- if(tilt>.12&&!mini){const lipx=x-R*1.02,lipy=cy0-lift*R*.22-R*.05;const q=(pw-.62)/.3;pourStream(c,lipx,lipy,lipx-R*.12,y+R*1.3,R*.06*Math.min(1,tilt*3)*(q<1?1:0),`rgba(${240},${238},${228},${.55+.4*cloud})`,t)}
+ if(pw>=0&&pw<.15&&!mini)((CI=>CI.ok&&holdPour(c,x+R*1.12,top0-R*.32,R,-1.5,c=>c.drawImage(CI,-R*.3,-R*.3,R*.6,R*.6*CI.naturalHeight/CI.naturalWidth)))(L('v53_cup'))),pourStream(c,x+R*.9,top0-R*.25,x+R*.2,top0+250*k,R*.06,'rgba(215,236,255,.85)',t,Math.min(1,pw/.03)*Math.min(1,(.15-pw)/.04));
+ if(tilt>.12&&!mini){const lipx=x-R*1.02,lipy=cy0-lift*R*.22-R*.05;const q=(pw-.62)/.3;hand2(c,lipx+R*.28,lipy+R*.02,R/80,-.6);pourStream(c,lipx,lipy,lipx-R*.38,y+R*.95,R*.12*Math.min(1,tilt*3)*(q<1?1:0),`rgba(${240},${238},${228},${.55+.4*cloud})`,t)}
  c.fillStyle=g;c.beginPath();c.ellipse(x,cy0,orx,ory,0,0,Math.PI);c.lineTo(x-orx*.93,by);c.ellipse(x,by,orx*.93,ory*.8,0,Math.PI,0,true);c.closePath();c.fill();
  c.strokeStyle='#d9dce1';c.lineWidth=R*.035;c.beginPath();c.ellipse(x,cy0,orx,ory,0,0,Math.PI);c.stroke();c.strokeStyle='rgba(255,255,255,.22)';c.lineWidth=R*.03;c.beginPath();c.ellipse(x,cy0+R*.2,orx*.98,ory,0,Math.PI*.15,Math.PI*.85);c.stroke();
  if(mini)return;
  /* measuring cup / paddle props + pours */
  const cupIm=L('v53_cup'),padIm=L('v53_paddle');
  if(!ck&&cupIm.ok){let cx=x+R*1.32,cyy=y+R*.35,rot=0;const P=pi>=0?pi:pow>=0?pow:-1;
-  if(P>=0){const e=Math.sin(Math.min(1,P*1.4)*Math.PI*.5)*(P>.8?(1-P)/.2:1),tx=pi>=0?x+R*.5:x+R*1.2,ty=pi>=0?top0+40*k:cy0-R*.55;cx+=(tx-cx)*e;cyy+=(ty-cyy)*e;rot=-1.5*e;
-   if(e>.75){const sx=cx-R*.22,sy2=cyy-R*.02;pourStream(c,sx,sy2,pi>=0?x+R*.15:x+R*1.06,pi>=0?top0+235*k:cy0+R*.02,R*.045,'rgba(210,235,255,.9)',t);if(pow>=0){c.strokeStyle='rgba(255,255,255,.8)';c.lineWidth=1.4;c.beginPath();c.ellipse(x+R*1.06,cy0+R*.03,R*.06*(1+(t*3%1)),R*.02,0,0,7);c.stroke()}}}
-  const w=R*.6;c.save();c.translate(cx,cyy);c.rotate(rot);c.drawImage(cupIm,-w/2,-w/2,w,w*cupIm.naturalHeight/cupIm.naturalWidth);if(P>=0){c.fillStyle='rgba(205,230,250,.55)';c.beginPath();c.ellipse(0,w*.05,w*.36,w*.08,0,0,7);c.fill()}c.restore()}
+  let amt=0;if(P>=0){const e=Math.sin(Math.min(1,P*4)*Math.PI*.5)*(P>.88?(1-P)/.12:1),tl=P<.22?0:P<.8?(P-.22)/.58:Math.max(0,1-(P-.8)/.08),tx=pi>=0?x+R*.62:x+R*1.3,ty=pi>=0?top0+20*k:cy0-R*.65;cx+=(tx-cx)*e;cyy+=(ty-cyy)*e;rot=-(.3+1.5*tl)*e;amt=P<.3?0:Math.min(1,(P-.3)/.08)*Math.max(0,Math.min(1,(.84-P)/.3));s._cupE=1-Math.min(1,Math.max(0,(P-.3)/.54));
+   if(amt>0){const w0=R*.6,lx=-w0*.42,ly=-w0*.28,sx=cx+lx*Math.cos(rot)-ly*Math.sin(rot),sy2=cyy+lx*Math.sin(rot)+ly*Math.cos(rot);pourStream(c,sx,sy2,pi>=0?x+R*.15:x+R*1.06,pi>=0?top0+235*k:cy0+R*.02,R*.05,'rgba(210,235,255,.85)',t,amt);if(pow>=0){c.strokeStyle='rgba(255,255,255,.8)';c.lineWidth=1.4;c.beginPath();c.ellipse(x+R*1.06,cy0+R*.03,R*.06*(1+(t*3%1)),R*.02,0,0,7);c.stroke()}}}
+  const w=R*.6;c.save();c.translate(cx,cyy);c.rotate(rot);c.drawImage(cupIm,-w/2,-w/2,w,w*cupIm.naturalHeight/cupIm.naturalWidth);if(P>=0&&s._cupE>.05){c.fillStyle='rgba(205,230,250,.55)';c.beginPath();c.ellipse(0,w*.05+w*.25*(1-s._cupE),w*.36*(.6+.4*s._cupE),w*.08,0,0,7);c.fill()}c.restore();if(P>=0&&!mini){c.strokeStyle='#e0a888';c.lineWidth=R*.16;c.lineCap='round';c.beginPath();c.moveTo(cx+w*.42,cyy+w*.1);c.lineTo(cx+w*1.1,cyy-w*.3);c.stroke();hand2(c,cx+w*.4,cyy+w*.12,R/210,rot-.3)}}
  if(ck&&padIm.ok){const w=R*.8;if(pf>=0){/* paddle cuts & turns */const ph=pf,cut=Math.sin(Math.min(1,ph*3)*Math.PI*.5),turn=ph>.35?Math.sin((ph-.35)/.65*Math.PI*2):0,px=x+R*.15-Math.sin(ph*Math.PI*2)*R*.25,py=top0+215*k+cut*R*.12-Math.abs(turn)*R*.15;
    c.save();c.translate(px,py);c.rotate(-.9+turn*.7);c.drawImage(padIm,-w*.25,-w*.75,w,w*padIm.naturalHeight/padIm.naturalWidth);c.restore();
    for(let q=0;q<22;q++){const ph2=(ph*2.5+rnd(q))%1;const gx=px+(rnd(q*3)-.5)*R*.6,gy=py+R*.05-Math.sin(ph2*Math.PI)*R*.3;c.save();c.translate(gx,gy);c.rotate(rnd(q)*6+ph*8);c.fillStyle='#fffdf6';c.beginPath();c.ellipse(0,0,R*.03,R*.013,0,0,7);c.fill();c.fillStyle='#d9d2c2';c.beginPath();c.ellipse(0,R*.006,R*.026,R*.006,0,0,7);c.fill();c.restore()}
@@ -557,11 +563,11 @@ function drawFX(c,s,x,y,R,t){const T=now();
   if(f.k==='fly'){for(let n=0;n<f.n;n++){const q=cl(p*1.15-n*.03),e=q*q*(3-2*q),tx=x+(rnd(n+f.t0)-.5)*R*.6,ty=y+(rnd(n*3+f.t0)-.5)*R*.2,px=f.sx+(tx-f.sx)*e,py=f.sy+(ty-f.sy)*e-Math.sin(q*Math.PI)*R*.9,sz=(1-.35*e)*(f.n>1?16:40);
     c.save();c.translate(px,py);c.rotate(q*4+n);if(f.img&&f.img.complete&&f.img.naturalWidth)c.drawImage(f.img,-sz/2,-sz/2,sz,sz);else{c.fillStyle=f.col;c.beginPath();c.ellipse(0,0,sz*.4,sz*.28,0,0,7);c.fill()}c.restore()}
    if(!f.landed&&p>.85){f.landed=1;splash(s,x,y,R)}}
-  else if(f.k==='pour'){const bx=x+R*.55,by=y-R*1.25,tilt=Math.min(1,p*4)*(p>.85?(1-p)/.15:1);
-   c.save();c.translate(bx,by);c.rotate(-.3-1.1*tilt);c.fillStyle=f.id==='water'||f.id==='coldw'?'rgba(220,235,250,.75)':f.glossy?'#2a1a10':'#f4efe4';c.strokeStyle='#0005';c.lineWidth=1.5;c.beginPath();c.moveTo(-R*.14,-R*.24);c.lineTo(R*.14,-R*.24);c.lineTo(R*.11,R*.18);c.lineTo(-R*.11,R*.18);c.closePath();c.fill();c.stroke();c.fillStyle='#fff6';c.fillRect(-R*.09,-R*.2,R*.04,R*.34);c.restore();
-   if(p>.18&&p<.92){const w=R*(f.glossy?.035:.05)*(1-Math.abs(p-.55));c.strokeStyle=f.col;c.globalAlpha=f.id==='water'?.7:.95;c.lineWidth=Math.max(2,w);c.lineCap='round';c.beginPath();const ox=bx-R*.2,oy=by-R*.05;c.moveTo(ox,oy);for(let q=1;q<=10;q++){const u=q/10;c.lineTo(ox+(x+R*.1-ox)*u+Math.sin(t*20+u*9)*R*.008,oy+(y-oy)*u*u*.2+(y-oy)*u*.8)}c.stroke();
-    if(f.glossy||f.id==='water'){c.strokeStyle='rgba(255,255,255,.55)';c.lineWidth=Math.max(1,w*.25);c.beginPath();c.moveTo(ox+2,oy);c.lineTo(x+R*.1+2,y-4);c.stroke()}
-    c.globalAlpha=1;if(Math.random()<.5)splash(s,x+R*.1,y,R*.5)}}
+  else if(f.k==='pour'){const tilt=Math.min(1,p*3.5)*(p>.85?(1-p)/.15:1),bx=x+R*.62,by=y-R*.7-tilt*R*.1,rot=-.2-1.25*tilt,amt=p<.2?0:p<.35?(p-.2)/.15:p>.8?Math.max(0,(.92-p)/.12):1;
+   const wat=f.id==='water'||f.id==='coldw',vc=wat?'rgba(225,238,250,.8)':f.glossy?'#3a2416':'#f4efe4';
+   holdPour(c,bx,by,R,rot,c=>{c.fillStyle=vc;c.strokeStyle='#0006';c.lineWidth=1.5;c.beginPath();c.moveTo(-R*.13,-R*.2);c.lineTo(R*.13,-R*.2);c.lineTo(R*.1,R*.16);c.quadraticCurveTo(0,R*.2,-R*.1,R*.16);c.closePath();c.fill();c.stroke();c.fillStyle='#fff7';c.fillRect(-R*.08,-R*.16,R*.035,R*.28);c.strokeStyle='#fff9';c.beginPath();c.ellipse(0,-R*.2,R*.13,R*.035,0,0,7);c.stroke()});
+   const lx=bx+Math.cos(rot-1.57)*R*.2-Math.sin(rot)*0-R*.13*Math.cos(rot),ly2=by+Math.sin(rot-1.57)*R*.2;
+   if(amt>0){pourStream(c,lx,ly2,x+R*.12,y+R*.02,R*(f.glossy?.03:.045),f.col,t,amt);if(Math.random()<.25)splash(s,x+R*.12,y,R*.5)}}
   else if(f.k==='splash'){const e=1-(1-p)**2;if(f.wet){c.strokeStyle=`rgba(255,255,255,${.6*(1-p)})`;c.lineWidth=2;c.beginPath();c.ellipse(f.x,f.y,R*.08+R*.35*e,R*.04+R*.15*e,0,0,7);c.stroke()}
    c.fillStyle=f.hot?`rgba(255,230,150,${1-p})`:f.col;c.globalAlpha=f.hot?1:.85*(1-p);for(let k=0;k<(f.hot?12:8);k++){const a=Math.PI+rnd(k+f.t0)*Math.PI,v=R*(.15+.25*rnd(k*3+f.t0));c.beginPath();c.arc(f.x+Math.cos(a)*v*e,f.y+Math.sin(a)*v*e*.6+R*.4*p*p,f.hot?1.6:2.4*(1-p)+1,0,7);c.fill()}}
   else if(f.k==='ladle'){const a=p*Math.PI*3,lx=x+Math.cos(a)*R*.38,ly=y+Math.sin(a)*R*.18;c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=2;for(let k=0;k<3;k++){c.beginPath();c.ellipse(x,y,R*(.2+k*.17),R*(.08+k*.07),0,a-1.2-k*.3,a-k*.3);c.stroke()}
@@ -677,12 +683,12 @@ function ctl(){const s=cur();const b=(id,l,on)=>`<button data-a="${id}" class="$
  if(s.kind==='wok'){h=s.dirty?b('wash','刷鍋'):'';if(!s.dirty&&K.chal.wokQ.length)h+=K.chal.wokQ.map(r=>b('wk_'+r,`<img class="dth" src="${A}dish_${r}.webp" alt="">炒 ${RECIPES.find(x=>x.id===r).n}`)).join('')}
  else if(['pot','fryer','potrice','pan'].includes(s.kind)){h=`<div class="heat">${[0,1,2,3].map(v=>`<button data-h="${v}" class="${s.heat===v?'on':''}">${['關火','小火','中火','大火'][v]}</button>`).join('')}</div>`;
   if(s.kind!=='fryer')h+=b('lid',s.lid?'掀蓋':'蓋鍋蓋');if(s.kind==='pot'||s.kind==='potrice')h+=b('stir','攪拌');if(s.kind==='pot')h+=b('skim','撈浮沫');
-  if(s.kind==='fryer')h+=(!s.shrimp.length&&!s.rack.length&&!s.coat?b('coat','裹粉'):'')+b('chop','插筷子')+b('lift','撈起')+b('mix','離火拌醬');if(s.kind==='pan')h+=b('flip','翻面');
+  if(s.kind==='fryer')h+=(!s.shrimp.length&&!s.rack.length&&!s.coat?b('coat','裹粉'):'')+b('chop','插筷子')+b('lift','撈起')+b('mix','拌美乃滋');if(s.kind==='pan')h+=b('flip','翻面');
   if(s.kind==='potrice')h+=(s.riceIn?'':b('wash','洗米')+b('addr','米下鍋'))+b('w+',s.cg?'加一杯水':'加水')+b('w-','倒掉些水')+(s.cg?'':b('fluff','翻鬆'))}
  else if(s.kind==='dg'||s.kind==='ec'){h=s.phase==='prep'&&s.kind==='dg'?(s.closed?b('lid','打開鍋蓋')+b('go','按下開關'):b('wash','洗米')+b('iw+','內鍋加水')+b('iw-','倒掉些水')+b('ow+','外鍋加水')+b('lid','蓋上鍋蓋')):s.phase==='prep'?b('wash','洗米')+b('iw+','內鍋加水')+b('iw-','倒掉些水')+(s.kind==='dg'?b('ow+','外鍋加水'):b('mode',s.mode==='quick'?'快煮':'標準',1))+b('go',s.kind==='dg'?'按下開關':'開始煮飯'):
   (s.kind==='dg'&&s.phase==='rest'?b('ow+','外鍋加水')+b('go','再按一次'):'')+b('peek',s.peek?'蓋上':'開蓋看看')+b('fluff','翻鬆')}
  else if(s.kind==='oven')h=b('pwr',s.on?'關烤箱':'開烤箱',s.on)+b('t-','溫度−')+b('t+','溫度＋')+b('door',s.door?'關門':'開門',s.door)+b('wrap','包餡')+b('in','放入')+b('out','取出');
- h+=b('ff','⏩ 10 分鐘');
+ h+=b('ff','⏩ 3 分鐘');
  const C=$('#kctl');C.innerHTML=h;C.querySelectorAll('[data-h]').forEach(x=>x.onclick=()=>{audio();const v=+x.dataset.h;if(s.out){s.out=0;s.relit=1}if(v&&!s.heat)sfx('ignite',.5);s.heat=v;ctl()});
  C.querySelectorAll('[data-a]').forEach(x=>x.onclick=()=>act(x.dataset.a));
  const tr=s.tray||[];$('#ktray').innerHTML=tr.map(id=>`<div class="ing ${s.used[id]&&!multi(id)?'used':''}" data-id="${id}">${icon(id)}<span>${I5[id].n}</span></div>`).join('');$('#ktray').parentElement.style.display=tr.length?'':'none';
@@ -712,7 +718,7 @@ function fryAdd(s,id){if(id==='oilf'){s.O+=730;sfx('drop',.3)}
  ctl()}
 function ovAdd(s,id){if(id==='yolk')s.yolks={c:0,wine:0,inOven:0};else if(id==='rwine'){if(s.yolks)s.yolks.wine=1}else if(id==='eggw'){if(s.past&&!s.past.inOven)s.coats++;else{ktoast('先包好');s.used.eggw--}}else if(id==='bsesame'){if(s.past)s.sesame=1}sfx('stir',.2);ctl()}
 function act(a){const s=cur();audio();try{actFX(s,a)}catch(e){}
- if(a==='ff')return K.skip(600);
+ if(a==='ff'){if(K.ffing)return;K.ffing=1;let n=0;const N=30,tm=setInterval(()=>{K.skip(6);if(++n>=N){clearInterval(tm);K.ffing=0;ctl()}},40);return}
  if(a==='lid'){if(s.kind==='dg'){s.closed=!s.closed;sfx('click',.5,.7);return ctl()}s.lid=!s.lid;if(!s.lid&&(s.T>90||s.riceIn&&s.p<1))s.lidOpens++;sfx('click',.4,.8);return ctl()}
  if(a==='stir'){s.stirT=K.t;sfx('stir',.4);if(s.egg&&s.egg.t<5){s.ribbons.forEach(r=>{if(r.set<.6)r.broken=1});s.flecks=1}if(s.slurryT!=null)s.slurryStir=1;if(s.kind==='potrice'&&s.riceIn&&s.p>.15)s.stirRice=(s.stirRice||0)+1;if(s.cg&&s.riceIn){s.nStir=(s.nStir||0)+1;s.stick=Math.max(0,s.stick-.9)}return}
  if(a==='skim'){if(s.foam>.02){s.foam*=.4;s.skims=(s.skims||0)+1;sfx('stir',.3,.7)}return}
