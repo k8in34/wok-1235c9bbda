@@ -789,7 +789,7 @@ kc.addEventListener('pointerdown',e=>{if(!K||K.done)return;const[px,py]=gPt(e);f
  if(!m)return;try{kc.setPointerCapture(e.pointerId)}catch(_){}audio();GS={m,s,x:px,y:py,x0:px,y0:py,ang:0,sa:0,hd:null,px,py,path:0,t0:RT(),acc:0,done:0,held:null,id:e.pointerId}});
 kc.addEventListener('pointermove',e=>{if(!GS||e.pointerId!==GS.id||!K)return;const s=GS.s;if(s!==cur()){GS=null;return}const[px,py]=gPt(e),Lo=lay(s,KW,KH),x=KW/2,y=Lo.y,R=Lo.R,d=Math.hypot(px-GS.x,py-GS.y);GS.path+=d;GS.x=px;GS.y=py;
  if(d>2){const h=Math.atan2(py-GS.py,px-GS.px);if(GS.hd!=null){let da=h-GS.hd;if(da>Math.PI)da-=6.283;if(da<-Math.PI)da+=6.283;GS.sa+=da;GS.ang=Math.abs(GS.sa)}GS.hd=h;GS.px=px;GS.py=py}
- if(GS.m==='pot'){while(GS.ang-GS.acc>=Math.PI){GS.acc+=Math.PI;act('stir')}
+ if(GS.m==='pot'){while(GS.ang-GS.acc>=Math.PI){GS.acc+=Math.PI;NOFX=1;act('stir');NOFX=0}
   if(s.kind==='pot'&&s.foam>.02&&Math.abs(px-x)<R*.95&&Math.abs(py-y)<R*.6){const f0=s.foam;s.foam*=Math.pow(.4,d/(R*3.2));if(!GS.sk&&f0-s.foam>.02){GS.sk=1;s.skims=(s.skims||0)+1}}}
  else if(GS.m==='wash'){if(!GS.done&&GS.ang>=9.4){GS.done=1;NOFX=1;act('wash');NOFX=0;(s.A||(s.A={})).wash=RT()-3.6*.62;GS=null}else if(!GS.sf||RT()-GS.sf>.5){GS.sf=RT();sfx('stir',.25,.9)}}
  else if(GS.m==='fluff'){if(!GS.done&&GS.path>R*2.2){GS.done=1;NOFX=1;act('fluff');NOFX=0;dgFX(s,'fluff')}}
