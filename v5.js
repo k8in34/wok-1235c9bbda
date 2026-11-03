@@ -132,7 +132,7 @@ function fryUpd(s,dt){const n=s.shrimp.filter(x=>x.in&&x.c<1).length;s.T-=n*12*d
  if(T>215)s.smoke=cl((T-215)/30,0,1.5);s.alarm=T>215?1:0;s.warn=T>195||s.shrimp.some(x=>x.in&&x.b>1.1)?1:0}
 function ckUpd(s,dt){
  if(s.kind==='dg'){if(s.phase==='cook'){s.progT+=dt;if(s.progT>240){s.p+=dt/1150*(s.iw>0?1:.3);s.ow=Math.max(0,s.ow-dt/1300)}
-   if(s.ow<=0&&s.progT>240){s.phase='rest';s.t0=K.t;sfx('click',.8);if(typeof fx==='function')fx({k:'puff',dur:1.2})}}
+   if(s.ow<=0&&s.progT>240){s.phase='rest';s.t0=K.t;sfx('click',.8);anSet(s,'pop');if(typeof fx==='function')fx({k:'puff',dur:1.2})}}
   else if(s.phase==='rest'){s.rest+=dt;if(s.p<1)s.p+=dt/1150*.25*Math.max(0,1-s.rest/900)}}
  else{if(s.phase==='cook'){s.progT+=dt;const dur=s.mode==='quick'?1680:2700;if(s.progT>dur*.25)s.p+=dt/(dur*.6);s.left=dur-s.progT;
    if(s.progT>=dur){s.phase='rest';s.t0=K.t;s.p=Math.max(s.p,1);s.rest=s.mode==='quick'?300:600;sfx('ding',.6)}}
@@ -394,7 +394,7 @@ function dgOpen(c,s,x,y,R,t,mini){const G=dgGeo(x,y,R),k2=G.hole*1.0/275,SQ=DGQ/
  if(pw>.55&&!mini){const sx=x-R*1.38,sy=y+R*.98,a2=Math.min(1,(pw-.55)/.06)*(pw>.95?(1-pw)/.05:1);c.save();c.globalAlpha=a2;const g=c.createLinearGradient(sx,sy-R*.2,sx,sy+R*.2);g.addColorStop(0,'#d9dee3');g.addColorStop(1,'#8b949c');c.fillStyle=g;c.beginPath();c.ellipse(sx,sy,R*.85,R*.32,0,0,7);c.fill();c.fillStyle='#5d666e';c.beginPath();c.ellipse(sx,sy+R*.03,R*.72,R*.24,0,0,7);c.fill();c.fillStyle='#2d3338';c.beginPath();c.ellipse(sx+R*.05,sy+R*.05,R*.06,R*.025,0,0,7);c.fill();c.restore()}
  if(pw>=0){const wi=Math.max(0,(s.washes||1)-1),c0=Math.max(.15,.95-wi*.3);lift=Math.min(1,pw/.1)*(pw>.92?(1-pw)/.08:1);
   if(pw<.15){lev=2.6*pw/.15;cloud=c0*.2}else if(pw<.62){lev=2.6;cloud=c0*Math.min(1,(pw-.15)/.25);tum=1}else{const q=(pw-.62)/.3;tilt=Math.sin(Math.min(1,q)*Math.PI)*.5;lev=2.6*Math.max(0,1-q*1.15);cloud=c0*(1-q*.2)}}
- if(GS&&GS.m==='wash'&&GS.s===s&&pw<0){lev=2.6;cloud=Math.max(.15,.95-Math.max(0,s.washes)*.3)*Math.min(1,GS.ang/9);tum=1}
+ if(GS&&GS.m==='wash'&&GS.s===s&&pw<0){lev=s.iw/1.2;cloud=Math.max(.15,.95-Math.max(0,s.washes)*.3)*Math.min(1,GS.ang/9);tum=1}
  c.save();c.beginPath();c.ellipse(x,G.Yr,G.hole,G.hole*DGQ,0,0,7);c.rect(x-R*3,G.Yr-R*4,R*6,R*4);c.clip();c.translate(-lift*tilt*R*.5,-lift*R*.3);if(tilt){c.translate(x-G.hole,cy0);c.rotate(-tilt);c.translate(-(x-G.hole),-cy0)}
  c.save();c.translate(0,G.Yr);c.scale(1,SQ);c.translate(0,-G.Yr);dgInner(c,s,x,itop,k2,t,mini,{ck,lev,cloud,tum});c.restore();
  if(pw>.15&&pw<.62&&!mini){const a=(pw-.15)/.47*Math.PI*6,hx=x+Math.cos(a)*R*.35,hy=top0+262*k+Math.sin(a)*R*.12;c.strokeStyle='#e0a888';c.lineWidth=R*.2;c.lineCap='round';c.beginPath();c.moveTo(hx,hy-R*.3);c.lineTo(hx+R*.5,hy-R*1.1);c.stroke();hand2(c,hx,hy-R*.1,R/75,Math.cos(a)*.15);c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=1.5;for(let q=0;q<3;q++){c.beginPath();c.ellipse(hx,hy+R*.02,R*(.08+q*.06+(t*.3%.06)),R*(.03+q*.02),0,0,7);c.stroke()}}
@@ -785,13 +785,13 @@ kc.addEventListener('pointerdown',e=>{if(!K||K.done)return;const[px,py]=gPt(e);f
  else if(s.kind==='pan'&&(s.cake||s.pieces.length)&&Math.abs(dx)<R*.95&&Math.abs(dy)<R*.65)m='flip';
  else if(s.kind==='dg'){const G=dgGeo(x,y,R),[jx,jy]=gJug(x,y,R),open=s.phase==='prep'&&!s.closed;
   if(open&&Math.abs(px-jx)<R*.4&&Math.abs(py-jy)<R*.6)m='pour';
-  else if(Math.abs(dx)<G.hole*1.1&&py>G.Yr-R*.9&&py<G.Yr+R*.45){if(open&&an(s,'wash',3.6)<0&&an(s,'lidon',1)<0)m='wash';else if(s.phase!=='prep'&&s.peek)m='fluff'}}
+  else if(Math.abs(dx)<G.hole*1.1&&py>G.Yr-R*.9&&py<G.Yr+R*.45){if(open&&an(s,'wash',3.6)<0&&an(s,'lidon',1)<0){if(s.iw>0)m='wash';else ktoast('先加水再洗米')}else if(s.phase!=='prep'&&s.peek)m='fluff'}}
  if(!m)return;try{kc.setPointerCapture(e.pointerId)}catch(_){}audio();GS={m,s,x:px,y:py,x0:px,y0:py,ang:0,sa:0,hd:null,px,py,path:0,t0:RT(),acc:0,done:0,held:null,id:e.pointerId}});
 kc.addEventListener('pointermove',e=>{if(!GS||e.pointerId!==GS.id||!K)return;const s=GS.s;if(s!==cur()){GS=null;return}const[px,py]=gPt(e),Lo=lay(s,KW,KH),x=KW/2,y=Lo.y,R=Lo.R,d=Math.hypot(px-GS.x,py-GS.y);GS.path+=d;GS.x=px;GS.y=py;
  if(d>2){const h=Math.atan2(py-GS.py,px-GS.px);if(GS.hd!=null){let da=h-GS.hd;if(da>Math.PI)da-=6.283;if(da<-Math.PI)da+=6.283;GS.sa+=da;GS.ang=Math.abs(GS.sa)}GS.hd=h;GS.px=px;GS.py=py}
  if(GS.m==='pot'){while(GS.ang-GS.acc>=Math.PI){GS.acc+=Math.PI;NOFX=1;act('stir');NOFX=0}
   if(s.kind==='pot'&&s.foam>.02&&Math.abs(px-x)<R*.95&&Math.abs(py-y)<R*.6){const f0=s.foam;s.foam*=Math.pow(.4,d/(R*3.2));if(!GS.sk&&f0-s.foam>.02){GS.sk=1;s.skims=(s.skims||0)+1}}}
- else if(GS.m==='wash'){if(!GS.done&&GS.ang>=9.4){GS.done=1;NOFX=1;act('wash');NOFX=0;(s.A||(s.A={})).wash=RT()-3.6*.62;GS=null}else if(!GS.sf||RT()-GS.sf>.5){GS.sf=RT();sfx('stir',.25,.9)}}
+ else if(GS.m==='wash'){if(!GS.done&&GS.ang>=9.4){GS.done=1;NOFX=1;act('wash');NOFX=0;s.iw=0;(s.A||(s.A={})).wash=RT()-3.6*.62;GS=null}else if(!GS.sf||RT()-GS.sf>.5){GS.sf=RT();sfx('stir',.25,.9)}}
  else if(GS.m==='fluff'){if(!GS.done&&GS.path>R*2.2){GS.done=1;NOFX=1;act('fluff');NOFX=0;dgFX(s,'fluff')}}
  else if(GS.m==='flip'){if(!GS.done&&GS.y0-py>R*.32){GS.done=1;NOFX=1;act('flip');NOFX=0;GS.fl=RT()}}
  else if(GS.m==='strain'){if(!GS.held&&GS.path>R*.6){GS.held=s.shrimp.filter(q=>q.in);GS.held.forEach(q=>{q.in=0;q.out=K.t});s.shrimp=s.shrimp.filter(q=>q.in);sfx('stir',.4)}}});
@@ -802,6 +802,11 @@ kc.addEventListener('pointerup',gEnd);kc.addEventListener('pointercancel',gEnd);
 setInterval(()=>{if(!GS||!K||GS.m!=='pour')return;const s=GS.s,Lo=lay(s,KW,KH),x=KW/2,R=Lo.R,G=dgGeo(x,Lo.y,R),tg=gPourT(s,G,x,R,GS.x,GS.y);if(!tg||s.closed||s.phase!=='prep'){GS.tg=null;return}GS.tg=tg;GS.acc+=.1;
  if(tg==='in'&&GS.acc>=.2){GS.acc=0;NOFX=1;act('iw+');NOFX=0}else if(tg==='out'&&GS.acc>=.6){GS.acc=0;NOFX=1;act('ow+');NOFX=0}},100);
 function gDraw(c,s,x,y,R,t){
+ if(s.kind==='dg'||s.kind==='ec'){const lines=[];const f=v=>(Math.round(v*100)/100).toString();
+  if(s.phase==='prep'){lines.push('已加入 '+s.rice+' 杯米');lines.push('米 '+s.rice+' 杯｜內鍋水 '+f(s.iw)+' 杯'+(s.kind==='dg'?'｜外鍋水 '+f(s.ow)+' 杯':''))}
+  else if(s.phase==='cook')lines.push('煮飯中…');else if(s.phase==='rest'){const m=Math.max(0,K.t-(s.t0||K.t));lines.push((s.kind==='dg'?'開關跳起・':'')+'燜飯中 '+Math.floor(m/60)+' 分')}
+  if(lines.length){c.save();c.font=`700 ${Math.round(R*.12)}px -apple-system,sans-serif`;c.textAlign='center';const w=Math.max(...lines.map(l=>c.measureText(l).width))+R*.2,h=R*.17,top=y-R*1.42;c.fillStyle='rgba(30,20,10,.62)';rr(c,x-w/2,top,w,h*lines.length+R*.06,R*.06);c.fill();c.fillStyle='#fff6e4';lines.forEach((l,i)=>c.fillText(l,x,top+R*.15+i*h));c.restore()}
+  const pp=an(s,'pop',1.6);if(pp>=0){const sx=x,sy=y+R*.3,a=1-pp,sc=.6+.6*Math.min(1,pp*4);c.save();c.globalAlpha=a;c.strokeStyle='#ffd34a';c.lineWidth=3;for(let k=0;k<10;k++){const an2=k/10*6.283;c.beginPath();c.moveTo(sx+Math.cos(an2)*R*.18*sc,sy+Math.sin(an2)*R*.18*sc);c.lineTo(sx+Math.cos(an2)*R*.34*sc,sy+Math.sin(an2)*R*.34*sc);c.stroke()}c.font=`900 ${Math.round(R*.2*sc)}px sans-serif`;c.textAlign='center';c.fillStyle='#fff';c.strokeStyle='#a33';c.lineWidth=4;c.strokeText('喀！',sx,sy-R*.38);c.fillText('喀！',sx,sy-R*.38);c.restore()}}
   if(s.kind==='fryer'&&GS&&GS.m==='strain'){const rx=x+R*.92,ry=y+R*1.02;if(!s.rack.length){c.fillStyle='rgba(0,0,0,.2)';c.beginPath();c.ellipse(rx,ry+R*.04,R*.45,R*.12,0,0,7);c.fill();c.fillStyle='#b8bcc2';c.beginPath();c.ellipse(rx,ry,R*.42,R*.11,0,0,7);c.fill();c.fillStyle='#f6f2e6';c.beginPath();c.ellipse(rx,ry-R*.01,R*.34,R*.08,0,0,7);c.fill()}}
  if(!GS||GS.s!==s)return;const px=GS.x,py=GS.y,m=GS.m;
  if(m==='pot'){c.save();steelBar(c,px,py,px+R*.7,py-R*.95,R*.04);c.fillStyle='#c8ccd2';c.beginPath();c.ellipse(px,py,R*.14,R*.06,0,0,7);c.fill();c.strokeStyle='rgba(255,255,255,.6)';c.lineWidth=1.5;for(let q=0;q<2;q++){c.beginPath();c.ellipse(px,py,R*(.18+q*.08),R*(.07+q*.03),0,0,7);c.stroke()}c.restore()}
@@ -814,7 +819,7 @@ function gDraw(c,s,x,y,R,t){
   if(GS.held){const dr=Math.max(0,1-(K.t-(GS.held[0]?GS.held[0].out:K.t))/40);for(let k=0;k<10;k++){const ph=(t*1.5+rnd(k))%1;c.fillStyle=`rgba(242,201,76,${.9*(1-ph)*dr})`;c.beginPath();c.ellipse(px+(rnd(k*5)-.5)*wr*1.5,py+wy*.6+ph*R*.4,1.6,2.6,0,0,7);c.fill()}}}
  else if(m==='pour'){const G=dgGeo(x,y,R),tg=GS.tg,rot=tg?-1.4:-.3;holdPour(c,px,py,R,rot,c=>{const CI=L('v53_cup');if(CI.ok)c.drawImage(CI,-R*.24,-R*.24,R*.48,R*.48*CI.naturalHeight/CI.naturalWidth)});
   if(tg){const ex=tg==='in'?Math.max(x-G.hole*.5,Math.min(x+G.hole*.5,px-R*.25)):(px>x?x+G.hole*.93:x-G.hole*.93);pourStream(c,px-R*.22,py-R*.05,ex,G.Yr+(tg==='in'?R*.05:R*.08),R*.05,'rgba(215,236,255,.85)',t,1);
-   c.font=`700 ${Math.round(R*.13)}px sans-serif`;c.textAlign='center';c.fillStyle='rgba(0,0,0,.55)';const lb=tg==='in'?'內鍋 '+s.iw.toFixed(1):'外鍋 '+s.ow+' 杯';c.fillRect(x-R*.45,G.Yr-R*1.25,R*.9,R*.2);c.fillStyle='#fff';c.fillText(lb,x,G.Yr-R*1.1)}}}
+}}}
 /* kitchen engine */
 function makeK(d,chal){const st=d.st.map(([k,nm,tray])=>k==='soup'?mkSt('pot',nm,tray):mkSt(k,nm,tray,k==='fryer'?{O:0}:{}));
  return {d,st,f:0,t:0,chal,done:0,res:{},
