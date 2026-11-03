@@ -784,7 +784,7 @@ let NOFX=0;function act(a){const s=cur();audio();try{if(!NOFX)actFX(s,a)}catch(e
  if(a==='out'){if(!s.door){ktoast('門沒開');return}if(s.past&&s.past.inOven){s.past.inOven=0;s.past.done=1}else if(s.yolks&&s.yolks.inOven){s.yolks.inOven=0;s.yolks.done=1}sfx('plate',.4);return}
  if(a.startsWith('wk_'))return K.startWok(a.slice(3))}
 /* v5.7 touch gestures: wash/pour/fluff (電鍋), flip (pan), strainer (fryer), stir/skim (pot) */
-let GS=null;kc.style.touchAction='none';
+let GS=null;kc.style.touchAction='none';document.documentElement.style.overscrollBehavior='none';document.addEventListener('touchmove',e=>{if(GS&&e.cancelable)e.preventDefault()},{passive:false});
 function gPt(e){const r=kc.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]}
 function gJug(x,y,R){return[x+R*1.22,y+R*.45]}
 function gPourT(s,G,x,R,px,py){if(Math.abs(px-x)>G.hole*1.15||py>G.Yr+R*.35||py<G.Yr-R*1.6)return null;return Math.abs(px-x)<G.hole*.62?'in':'out'}
